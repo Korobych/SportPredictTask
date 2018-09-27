@@ -5,9 +5,10 @@ import os
 
 
 app = Flask(__name__,
-            static_folder = "./dist/static",
-            template_folder = "./dist")
+            static_folder = "../vue/dist/static",
+            template_folder = "../vue/dist")
 @app.route('/')
 def Index():
     return render_template("index.html")
+
 app.run(host="0.0.0.0")
