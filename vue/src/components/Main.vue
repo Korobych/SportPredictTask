@@ -18,7 +18,7 @@ export default {
   name: 'Main',
   data () {
     return {
-      msg: 'Elliot-Fibbonaci'
+      msg: 'Elliott Fibonacci'
     }
   }
 }
