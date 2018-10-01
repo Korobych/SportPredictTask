@@ -1,15 +1,14 @@
-#!/usr/bin/python3
 from bs4 import BeautifulSoup
 import requests
 import pandas as pnd
-from requests_html import HTMLSession
+from requests_html import HTMLSession   
 
 
 # Today
 class Parser:
 
     def __init__(self):
-        self.url = 'https://www.myscore.ru/'
+        self.url = 'https://www.myscore.ru'
         self.session = HTMLSession()
 
     def GetUrl(self, url=0):
@@ -35,7 +34,7 @@ class Parser:
         # soup = BeautifulSoup(page,"html.parser")
         # check = soup.find("div",{"id":"fscon"})
         res = self.GetUrl()  # == res.text
-
+        res.html.render(sleep=1)
         teams_home = res.html.find('.padr')
         teams_away = res.html.find('.padl')
         all_games_scores = res.html.find('.cell_sa.score')
@@ -59,7 +58,9 @@ class Parser:
         d = {'start_time': games_start_times_array, 'game_status': games_statuses_array, 'home_team': teams_home_array,
              'score': all_games_scores_array, 'away_team': teams_away_array }
         todayDataFrame = pnd.DataFrame(data = d)
-        print(todayDataFrame)
+        # print(todayDataFrame.size)
+        return todayDataFrame.size
+
 
 
 if __name__ == "__main__":

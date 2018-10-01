@@ -1,2 +1,5 @@
 Flask==1.0.2
 beautifulsoup4==4.5.3
+pandas==0.23.4
+requests-html
+requests==2.19.1
