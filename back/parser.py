@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pnd
-from requests_html import HTMLSession   
+from requests_html import HTMLSession 
+from requests_html import AsyncHTMLSession  
 
 
 # Today
@@ -10,20 +11,71 @@ class Parser:
     def __init__(self):
         self.url = 'https://www.myscore.ru'
         self.session = HTMLSession()
+        self.urls = {
+            "Хоккей":"/hockey","Теннис":"/tennis","Баскетбол":"/basketball",
+            "Волейбол":"/voleyball","Гандбол":"/handball","Футзал":"/futsal",
+            "Бейсбол":"/basebal"}
 
-    def GetUrl(self, url=0):
-        if url == 0:
+    def GetUrl(self,sport):
+        if sport == "Футбол":
             res = self.session.get(self.url)
-            res.html.render()
             return res
         else:
-            # if /hockey in url -> do something
-            # to get teams in hockey use .padl
-            res = requests.get(url)
-            return res.text
+            try:
+                    sportUrl = self.urls[sport]
+            except KeyError:
+                    print("Not at dict")
+                    return
+            fullUrl = self.url + self.urls[sport]
+            res = self.session.get(fullUrl)
+            return res
 
-    # Friday Task
-    def Today(self):
+    def SportToday(self,sport):
+        teams_home_array = []
+        teams_away_array = []
+        teams_home_scores = []
+        teams_away_scores = []
+        games_statuses_array = []
+        games_start_times_array = []
+
+        if sport == "Футбол":
+            self.Today()
+        res = self.GetUrl(sport)
+        res.html.render(sleep=1)
+        teams_home = res.html.find('.padl')
+        i = 0
+        while i<len(teams_home):
+            teams_home_array += [teams_home[i].text]
+            teams_away_array += [teams_home[i+1].text]
+            i+=2
+        print(len(teams_away_array)>0)
+        print(len(teams_away_array)==len(teams_home_array))
+        print(teams_away_array)
+
+        if len(teams_away_array)==len(teams_home_array) and len(teams_away_array)>0:
+            games_scores_home = res.html.find('.cell_sc.score-home')
+            games_scores_away = res.html.find('.cell_ta.score-away')
+            games_statuses = res.html.find('.cell_aa.timer')
+            games_start_times = res.html.find('.cell_ad.time')
+
+            for score in games_scores_home:
+                teams_home_scores.append(score.text.replace('\xa0', ''))
+            for score in games_scores_away:
+                teams_away_scores.append(score.text.replace('\xa0', ''))
+            for game in games_statuses:
+                games_statuses_array.append(game.text)
+            for time in games_start_times:
+                games_start_times_array.append(time.text)
+        
+            d = {'start_time': games_start_times_array, 'game_status': games_statuses_array, 'home_team': teams_home_array,
+               'score_home': teams_home_scores,'score_away':teams_away_scores, 'away_team': teams_away_array }
+            todayDataFrame = pnd.DataFrame(data = d)
+            print(todayDataFrame)
+        else:
+            print("Bad")
+
+
+    def Today(self): # Footbal
         teams_home_array = []
         teams_away_array = []
         all_games_scores_array = []
@@ -33,7 +85,7 @@ class Parser:
 
         # soup = BeautifulSoup(page,"html.parser")
         # check = soup.find("div",{"id":"fscon"})
-        res = self.GetUrl()  # == res.text
+        res = self.GetUrl("Футбол")  # == res.text
         res.html.render(sleep=1)
         teams_home = res.html.find('.padr')
         teams_away = res.html.find('.padl')
@@ -63,6 +115,9 @@ class Parser:
 
 
 
+
+
 if __name__ == "__main__":
     full = Parser()
-    full.Today()
+    test = input("Введите название спорта:")
+    full.SportToday(test)
