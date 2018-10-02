@@ -6,14 +6,15 @@
    <form class="form-inline">
     <input v-model="fcommand" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search">
     <input v-model="scommand" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search"> 
-    <select class="form-control">
-     <option v-for="i in sport" :key="i" >{{ i }}</option>
+    <select  v-model="change" class="form-control">
+     <option  v-for="i in sport" :key="i" >{{ i }}</option>
     </select>
-
     <button @click="Parse()" class="btn btn-outline-success my-2 my-sm-0 find" type="submit">Найти</button>
   </form>
+
   </div>
 </nav>
+<center>{{info}}</center>
 </div>
 </template>
 
@@ -28,6 +29,7 @@ export default {
       change:"",
       fcommand:"",
       scommand:"",
+      info:"",
       sport:[
         "Футбол",
         "Хоккей",
@@ -42,9 +44,10 @@ export default {
   },
   methods:{
     Parse(){
-      console.log(this.i)
-      console.log(this.fcommand)
-      console.log(this.scommand)
+      axios.post('http://localhost:5000/today',{"sport":this.change})
+      .then(res=>{
+        this.info = res
+      })
     }
   }
 }

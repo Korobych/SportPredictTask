@@ -40,6 +40,7 @@ class Parser:
 
         if sport == "Футбол":
             self.Today()
+            return
         res = self.GetUrl(sport)
         res.html.render(sleep=1)
         teams_home = res.html.find('.padl')
@@ -70,9 +71,11 @@ class Parser:
             d = {'start_time': games_start_times_array, 'game_status': games_statuses_array, 'home_team': teams_home_array,
                'score_home': teams_home_scores,'score_away':teams_away_scores, 'away_team': teams_away_array }
             todayDataFrame = pnd.DataFrame(data = d)
-            print(todayDataFrame)
+            # print(todayDataFrame)
+            return todayDataFrame
         else:
-            print("Bad")
+            # print("Bad")
+            return "Bad"
 
 
     def Today(self): # Footbal
@@ -82,6 +85,7 @@ class Parser:
         # live_games_scores_array = []
         games_statuses_array = []
         games_start_times_array = []
+
 
         # soup = BeautifulSoup(page,"html.parser")
         # check = soup.find("div",{"id":"fscon"})
@@ -110,8 +114,8 @@ class Parser:
         d = {'start_time': games_start_times_array, 'game_status': games_statuses_array, 'home_team': teams_home_array,
              'score': all_games_scores_array, 'away_team': teams_away_array }
         todayDataFrame = pnd.DataFrame(data = d)
-        # print(todayDataFrame.size)
-        return todayDataFrame.size
+        print(todayDataFrame)
+        # return todayDataFrame.size
 
 
 
