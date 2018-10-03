@@ -2,7 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pnd
 from requests_html import HTMLSession 
-from requests_html import AsyncHTMLSession  
+from requests_html import AsyncHTMLSession 
+import sys 
 
 
 # Today
@@ -13,8 +14,8 @@ class Parser:
         self.session = HTMLSession()
         self.urls = {
             "Хоккей":"/hockey","Теннис":"/tennis","Баскетбол":"/basketball",
-            "Волейбол":"/voleyball","Гандбол":"/handball","Футзал":"/futsal",
-            "Бейсбол":"/basebal"}
+            "Волейбол":"/volleyball","Гандбол":"/handball","Футзал":"/futsal",
+            "Бейсбол":"/baseball"}
 
     def GetUrl(self,sport):
         if sport == "Футбол":
@@ -49,9 +50,9 @@ class Parser:
             teams_home_array += [teams_home[i].text]
             teams_away_array += [teams_home[i+1].text]
             i+=2
-        print(len(teams_away_array)>0)
-        print(len(teams_away_array)==len(teams_home_array))
-        print(teams_away_array)
+        # print(len(teams_away_array)>0)
+        # print(len(teams_away_array)==len(teams_home_array))
+        # print(teams_away_array)
 
         if len(teams_away_array)==len(teams_home_array) and len(teams_away_array)>0:
             games_scores_home = res.html.find('.cell_sc.score-home')
@@ -71,8 +72,8 @@ class Parser:
             d = {'start_time': games_start_times_array, 'game_status': games_statuses_array, 'home_team': teams_home_array,
                'score_home': teams_home_scores,'score_away':teams_away_scores, 'away_team': teams_away_array }
             todayDataFrame = pnd.DataFrame(data = d)
-            # print(todayDataFrame)
-            return todayDataFrame
+            print(todayDataFrame)
+            # return todayDataFrame
         else:
             # print("Bad")
             return "Bad"
@@ -118,10 +119,12 @@ class Parser:
         # return todayDataFrame.size
 
 
-
-
-
 if __name__ == "__main__":
     full = Parser()
-    test = input("Введите название спорта:")
+    # test = input("Введите название спорта:")
+    test = sys.argv[1]
+    full.SportToday(test)
+else:
+    full = Parser()
+    test = sys.argv[1]
     full.SportToday(test)

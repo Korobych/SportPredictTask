@@ -2,8 +2,8 @@
 from flask import Flask, render_template, json, jsonify
 from flask import request
 import os
-import parser
 import asyncio
+import subprocess
 
 
 app = Flask(__name__,
@@ -17,11 +17,9 @@ def Index():
 def SportTd():
     data = request.get_json()
     print(data)
-    # asyncio.set_event_loop().run_until_complete()
-    r = parser.Parser()
-    o = r.Today()
-    # return "check"
-    return(str("2"))
+    a = subprocess.check_output("python3.6 parser.py "+data["sport"],shell=True)
+    return(a)
 
 
-app.run(host="0.0.0.0")
+if __name__ == "__main__":
+    app.run(threaded=True)

@@ -1,1 +1,0 @@
-{"version":3,"sources":["app.9d9a97ce21df561b0db350a276737805.css"],"names":[],"mappings":"AACA,MACE,eAAiB,CAClB,AACD,MACE,gBAAiB,AACjB,WAAa,CACd,AACD,MACE,gBAAkB,CACnB","file":"app.9d9a97ce21df561b0db350a276737805.css","sourcesContent":["\n.head{\n  margin-left: 35%;\n}\n.name{\n  margin-left: 25%;\n  color: azure;\n}\n.find{\n  margin-left: 15px;\n}\n"]}
