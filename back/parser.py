@@ -78,6 +78,18 @@ class Parser:
             # print("Bad")
             return "Bad"
 
+    def GetLeagues(self,sport,res):
+        leagueArray = []
+        if sport == "Футбол":
+            units = res.html.find('.soccer')
+            for i in units:
+                matchesCount = i.find('tbody')
+                print(matchesCount)
+                country = i.find('.country_part')[0]
+                tournament = i.find('.tournament_part')[0]
+                print(country.text,tournament.text)
+        else:
+            pass
 
     def Today(self): # Footbal
         teams_home_array = []
@@ -117,14 +129,16 @@ class Parser:
         todayDataFrame = pnd.DataFrame(data = d)
         print(todayDataFrame)
         # return todayDataFrame.size
+        self.GetLeagues("Футбол",res)
 
 
 if __name__ == "__main__":
     full = Parser()
-    # test = input("Введите название спорта:")
-    test = sys.argv[1]
+    test = input("Введите название спорта:")
+    # test = sys.argv[1]
     full.SportToday(test)
-else:
-    full = Parser()
-    test = sys.argv[1]
-    full.SportToday(test)
+    # full.GetLeagues()
+# else:
+#     full = Parser()
+#     test = sys.argv[1]
+#     full.SportToday(test)
