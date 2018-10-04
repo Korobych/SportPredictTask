@@ -62,16 +62,16 @@ class Parser:
             return "Bad"
 
     def GetLeagues(self,sport,driver):
-        leagueArray = []
         if sport == "Футбол":
             check = driver.find_elements_by_class_name("expand-league")
             i = 0
             while i < len(check):
                 try:
-                     check[i].click()
-                     i+=1
+                    check[i].click()
+                    i+=1
                 except selenium.common.exceptions.WebDriverException:
-                   i+1
+                    i+1
+            print("end")
         else:
             pass
 
@@ -81,11 +81,27 @@ class Parser:
         all_games_scores_array = []
         games_statuses_array = []
         games_start_times_array = []
+        league_array = []
         driver = webdriver.Chrome('./chromedriver')
+        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         url = self.url + self.urls["Футбол"]
         driver.get(url)
 
-        self.GetLeagues("Футбол",driver)
+        self.GetLeagues("Футбол", driver)
+        soccer_bloсks = driver.find_elements_by_class_name("soccer")
+        last_block = ""
+        for block in soccer_bloсks:
+            country = block.find_element_by_class_name("country_part")
+            tournament = block.find_element_by_class_name("tournament_part")
+            league_string = country.text + tournament.text
+            if last_block == league_string:
+                continue
+
+            last_block = league_string
+            tbody = block.find_element_by_tag_name("tbody")
+            trs = tbody.find_elements_by_tag_name("tr")
+            for i in range(len(trs)):
+                league_array.append(league_string)
 
         teams_home = driver.find_elements_by_class_name("padr")
         teams_away = driver.find_elements_by_class_name("padl")
@@ -105,10 +121,11 @@ class Parser:
             games_start_times_array.append(time.text)
 
         d = {'start_time': games_start_times_array, 'game_status': games_statuses_array, 'home_team': teams_home_array,
-             'score': all_games_scores_array, 'away_team': teams_away_array}
+             'score': all_games_scores_array, 'away_team': teams_away_array, 'league': league_array}
         driver.close()
         return d
-        
+
+
 if __name__ == "__main__":
     full = Parser()
     test = input("Введите название спорта:")
