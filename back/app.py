@@ -4,7 +4,7 @@ from flask import request
 import os
 import asyncio
 import subprocess
-
+import sparser
 
 app = Flask(__name__,
             static_folder = "../vue/dist/static",
@@ -17,9 +17,11 @@ def Index():
 def SportTd():
     data = request.get_json()
     print(data)
-    a = subprocess.check_output("python3.6 parser.py "+data["sport"],shell=True)
-    return(a)
-
+    check = sparser.Parser()
+    f = check.SportToday(data["sport"])
+    print(f)
+    return jsonify(start_time=f["start_time"],game_status=f["game_status"],home_team=f["home_team"],score=f["score"],away_team=f["away_team"])
+    # return str(f)
 
 if __name__ == "__main__":
     app.run(threaded=True)

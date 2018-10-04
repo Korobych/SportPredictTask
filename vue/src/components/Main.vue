@@ -5,17 +5,28 @@
     <h2 class="name">{{msg}}</h2>
    <form class="form-inline">
     <input v-model="fcommand" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search">
-    <input v-model="scommand" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search"> 
-    <select  v-model="change" class="form-control">
+    <input v-model="scommand" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search">
+    <button class="btn btn-outline-success my-2 my-sm-0">Найти</button>  
+     <select  v-model="change" class="form-control change">
      <option  v-for="i in sport" :key="i" >{{ i }}</option>
-    </select>
+    </select>  
   </form>
-  <div class="butt">
-    <center><button @click="Parse()" class="btn btn-outline-success my-2 my-sm-0 find">Найти</button></center>
+    <div class="sbut">
+      <button  @click="Parse()" class="btn btn-outline-success my-2 my-sm-0">Сегодня</button> 
   </div>
+    
   </div>
 </nav>
-<div v-bind:class="{ loader: isActive }">{{info}}</div>
+<div v-bind:class="{ loader: isActive }"></div>
+  <table class="tab" cellspacing="5">
+      <tr>
+        <td><div v-for="i in time">{{ i }}</div></td>
+        <td><div v-for="i in status">{{ i }}</div></td>
+        <td><div v-for="i in home_team">{{ i }}</div></td>
+        <td><div v-for="i in score">{{ i }}</div></td>
+        <td><div v-for="i in away_team">{{ i }}</div></td>
+      </tr>
+    </table>
 </div>
 </template>
 
@@ -28,10 +39,12 @@ export default {
     return {
       msg: 'Elliott Fibonacci',
       change:"",
-      fcommand:"",
       isActive:false,
-      scommand:"",
-      info:"",
+      time:"",
+      status:"",
+      home_team:"",
+      away_team:"",
+      score:"",
       sport:[
         "Футбол",
         "Хоккей",
@@ -47,10 +60,21 @@ export default {
   methods:{
     Parse(){
       this.isActive = true;
+      this.time="";
+      this.status="";
+      this.home_team="";
+      this.away_team="";
+      this.score="";
       axios.post('http://localhost:5000/today',{"sport":this.change})
       .then(res=>{
         this.isActive = false
-        this.info = res.data
+        this.Act = true
+        this.time = res.data.start_time
+        this.status = res.data.game_status
+        this.home_team = res.data.home_team
+        this.away_team = res.data.away_team
+        this.score = res.data.score
+        console.log(typeof res.data)
       })
     }
   }
@@ -61,16 +85,31 @@ export default {
   margin-left: 35%;
 }
 .name{
-  margin-left: 25%;
+  /* margin-left: 25%; */
   color: azure;
 }
-.find{
-  margin-left: 15px;
-}
 .butt{
-   margin-left: 600px;
-   margin-top:-35px;
+  margin-left: -680px;
+   margin-bot:20px;
 }
+.tab{
+  margin:auto;
+}
+.change{
+  margin-right:700px;
+  margin-top:30px;
+  
+}
+.today{
+  margin-top:2000px;
+}
+.sbut{
+  margin-left:150px;
+  margin-top:-37px;
+}
+
+
+
 .loader,
 .loader:before,
 .loader:after {
