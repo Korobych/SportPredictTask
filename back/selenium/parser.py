@@ -29,7 +29,7 @@ class Parser:
             self.FootBall()
             return
 
-        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        driver = webdriver.Chrome('chromedriver')
         url = self.url + self.urls[sport]
         driver.get(url)
         teams_home = driver.find_elements_by_class_name("padl")
@@ -70,11 +70,13 @@ class Parser:
                 try:
                      check[i].click()
                      i+=1
+                     print("step")
                      time.sleep(1)
                 except selenium.common.exceptions.WebDriverException:
                    i+1
                    time.sleep(1)
-            time.sleep(10)
+            print("end")
+            driver.get(self.url + self.urls[sport])
 
         else:
             pass
@@ -85,11 +87,12 @@ class Parser:
         all_games_scores_array = []
         games_statuses_array = []
         games_start_times_array = []
-        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         url = self.url + self.urls["Футбол"]
         driver.get(url)
 
-       
+        self.GetLeagues("Футбол",driver)
+
         teams_home = driver.find_elements_by_class_name("padr")
         teams_away = driver.find_elements_by_class_name("padl")
         all_games_scores = driver.find_elements_by_class_name("cell_sa")
@@ -108,11 +111,10 @@ class Parser:
             games_start_times_array.append(time.text)
 
         d = {'start_time': games_start_times_array, 'game_status': games_statuses_array, 'home_team': teams_home_array,
-             'score': all_games_scores_array, 'away_team': teams_away_array }
-        todayDataFrame = pnd.DataFrame(data = d)
+             'score': all_games_scores_array, 'away_team': teams_away_array}
+        todayDataFrame = pnd.DataFrame(data=d)
         print(todayDataFrame)
         # return todayDataFrame.size
-        self.GetLeagues("Футбол",driver)
         
 
 
