@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pnd
 from requests_html import HTMLSession 
-from requests_html import AsyncHTMLSession 
 import sys 
 
 
@@ -84,7 +83,11 @@ class Parser:
             units = res.html.find('.soccer')
             for i in units:
                 matchesCount = i.find('tbody')
-                print(matchesCount)
+                if len(matchesCount) == 0:
+                    print("bad") # Логика нажатия
+                else:
+                    print(matchesCount)
+                    
                 country = i.find('.country_part')[0]
                 tournament = i.find('.tournament_part')[0]
                 print(country.text,tournament.text)
@@ -135,10 +138,4 @@ class Parser:
 if __name__ == "__main__":
     full = Parser()
     test = input("Введите название спорта:")
-    # test = sys.argv[1]
     full.SportToday(test)
-    # full.GetLeagues()
-# else:
-#     full = Parser()
-#     test = sys.argv[1]
-#     full.SportToday(test)
