@@ -6,7 +6,7 @@ import sys
 from selenium import webdriver 
 import selenium
 import numpy as np
-import time
+import time as t
 
 # Today
 class Parser:
@@ -20,7 +20,7 @@ class Parser:
         self.team_urls = {}
         self.docker = '/app/back/chromedriver'
 
-    def SportToday(self,sport):
+    def SportToday(self,sport,first="",sec=""):
         teams_home_array = []
         teams_away_array = []
         teams_home_scores = []
@@ -29,8 +29,12 @@ class Parser:
         games_start_times_array = []
 
         if sport == "Футбол":
-            t = self.FootBall()
-            return t
+            if len(first)==0:
+                t = self.FootBall()
+                return t
+            else:
+                t = self.FootBall(first,sec)
+                return t
 
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
         driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
@@ -92,8 +96,10 @@ class Parser:
                     padl = el.find_element_by_class_name("padl")
                     if padr.text == team1 and padl.text == team2 or padr.text == team2 and padl.text == team1:
                         el.click()
+                        t.sleep(5)
                         window_after = driver.window_handles[1]
                         driver.switch_to.window(window_after)
+
                         teams_url_data = driver.find_elements_by_class_name("participant-imglink")
                         teams_url_data = np.array(teams_url_data)
                         teams_url_data = teams_url_data[[1, 3]]
@@ -126,6 +132,7 @@ class Parser:
                     el.click()
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
+                    
                     teams_url_data = driver.find_elements_by_class_name("participant-imglink")
                     teams_url_data = np.array(teams_url_data)
                     teams_url_data = teams_url_data[[1, 3]]
@@ -141,7 +148,7 @@ class Parser:
         else:
             print("другой спорт")
 
-    def FootBall(self): # Footbal
+    def FootBall(self, first="",sec=""): # Footbal
         teams_home_array = []
         teams_away_array = []
         all_games_scores_array = []
@@ -157,14 +164,15 @@ class Parser:
 
         # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
 
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
      
         url = self.url + self.urls["Футбол"]
         driver.get(url)
-
+        t.sleep(20)
         self.GetLeagues("Футбол", driver)
         soccer_bloсks = driver.find_elements_by_class_name("soccer")
+
         last_block = ""
         for block in soccer_bloсks:
             country = block.find_element_by_class_name("country_part")
@@ -207,20 +215,29 @@ class Parser:
 
         # test get two teams urls
         # расскоменти, что бы попробовать!
-        self.get_two_teams_url(d['home_team'][20], d['away_team'][20], "Футбол", driver)
-
+        if len(first) == 0:
+                self.get_two_teams_url(d['home_team'][20], d['away_team'][20], "Футбол", driver)
+                t.sleep(10)
+                print(self.team_urls)
+                print(len(self.team_urls))
+                driver.close()
+                return d
+        else:
+                self.get_two_teams_url(first, sec, "Футбол", driver)
+                t.sleep(10)
+                print(self.team_urls)
+                print(len(self.team_urls))
+                driver.close()
+                return d
         # test get all teams urls
         # расскоменти, что бы попробовать!
         # self.get_all_teams_url("Футбол", driver)
 
         # check the results of url parsing. May be deleted
-        print(self.team_urls)
-        print(len(self.team_urls))
-        driver.close()
-        return d
+       
 
 
 if __name__ == "__main__":
     full = Parser()
     test = input("Введите название спорта:")
-    full.SportToday(test)
+    full.SportToday(test,"Лестер","Эвертон")
