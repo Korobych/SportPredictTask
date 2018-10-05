@@ -16,6 +16,7 @@ class Parser:
             "Хоккей":"/hockey","Теннис":"/tennis","Баскетбол":"/basketball",
             "Волейбол":"/volleyball","Гандбол":"/handball","Футзал":"/futsal",
             "Бейсбол":"/baseball","Футбол":"/"}
+        self.team_urls = {}
 
     def SportToday(self,sport):
         teams_home_array = []
@@ -82,14 +83,15 @@ class Parser:
         games_statuses_array = []
         games_start_times_array = []
         league_array = []
-        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         url = self.url + self.urls["Футбол"]
         driver.get(url)
 
         self.GetLeagues("Футбол", driver)
         soccer_bloсks = driver.find_elements_by_class_name("soccer")
         last_block = ""
+        window_before = driver.window_handles[0]
         for block in soccer_bloсks:
             country = block.find_element_by_class_name("country_part")
             tournament = block.find_element_by_class_name("tournament_part")
@@ -100,9 +102,24 @@ class Parser:
             last_block = league_string
             tbody = block.find_element_by_tag_name("tbody")
             trs = tbody.find_elements_by_tag_name("tr")
-            for i in range(len(trs)):
+            for el in trs:
+                el.click()
+                window_after = driver.window_handles[1]
+                driver.switch_to.window(window_after)
+                teams_url_data = driver.find_elements_by_class_name("participant-imglink")
+                for team in teams_url_data:
+                    team_name = team.text
+                    team_url = team.get_attribute("onclick")
+                    # clearing url from
+                    team_url = team_url.replace('window.open(\'', '')
+                    team_url = team_url.replace('\'); return false;', '')
+                    print(team_name, team_url)
+                    self.team_urls.update({team_name: team_url})
+                driver.close()
+                driver.switch_to.window(window_before)
                 league_array.append(league_string)
 
+        print(self.team_urls)
         teams_home = driver.find_elements_by_class_name("padr")
         teams_away = driver.find_elements_by_class_name("padl")
         all_games_scores = driver.find_elements_by_class_name("cell_sa")
