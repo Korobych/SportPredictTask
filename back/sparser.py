@@ -5,6 +5,7 @@ from requests_html import HTMLSession
 import sys
 from selenium import webdriver 
 import selenium
+import numpy as np
 import time
 
 # Today
@@ -31,7 +32,8 @@ class Parser:
             t = self.FootBall()
             return t
 
-        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         url = self.url + self.urls[sport]
         driver.get(url)
         teams_home = driver.find_elements_by_class_name("padl")
@@ -77,6 +79,68 @@ class Parser:
         else:
             pass
 
+    def get_two_teams_url(self, team1, team2, sport, driver):
+        window_before = driver.window_handles[0]
+        if sport == "Футбол":
+            soccer_bloсks = driver.find_elements_by_class_name("soccer")
+            for block in soccer_bloсks[1:]:
+                tbody = block.find_element_by_tag_name("tbody")
+                trs = tbody.find_elements_by_tag_name("tr")
+                print(len(trs), '- количество игр в лиге')
+                for el in trs:
+                    padr = el.find_element_by_class_name("padr")
+                    padl = el.find_element_by_class_name("padl")
+                    if padr.text == team1 and padl.text == team2 or padr.text == team2 and padl.text == team1:
+                        el.click()
+                        window_after = driver.window_handles[1]
+                        driver.switch_to.window(window_after)
+                        teams_url_data = driver.find_elements_by_class_name("participant-imglink")
+                        teams_url_data = np.array(teams_url_data)
+                        teams_url_data = teams_url_data[[1, 3]]
+                        print(len(teams_url_data), ' - количество команд')
+                        for team in teams_url_data:
+                            team_name = team.text
+                            team_url = team.get_attribute("onclick")
+                            # clearing url from
+                            team_url = team_url.replace('window.open(\'', '')
+                            team_url = team_url.replace('\'); return false;', '')
+                            print(team_name, '- название команды')
+                            print(team_url, '- ссылка на страницу')
+                            self.team_urls.update({team_name: team_url})
+                        driver.close()
+                        driver.switch_to.window(window_before)
+                        return
+                    else:
+                        print("нет такой пары команд")
+        else:
+            print("другой спорт")
+
+    def get_all_teams_url(self, sport, driver):
+        if sport == "Футбол":
+            soccer_bloсks = driver.find_elements_by_class_name("soccer")
+            window_before = driver.window_handles[0]
+            for block in soccer_bloсks[1:]:
+                tbody = block.find_element_by_tag_name("tbody")
+                trs = tbody.find_elements_by_tag_name("tr")
+                for el in trs:
+                    el.click()
+                    window_after = driver.window_handles[1]
+                    driver.switch_to.window(window_after)
+                    teams_url_data = driver.find_elements_by_class_name("participant-imglink")
+                    teams_url_data = np.array(teams_url_data)
+                    teams_url_data = teams_url_data[[1, 3]]
+                    for team in teams_url_data:
+                        team_name = team.text
+                        team_url = team.get_attribute("onclick")
+                        # clearing url from
+                        team_url = team_url.replace('window.open(\'', '')
+                        team_url = team_url.replace('\'); return false;', '')
+                        self.team_urls.update({team_name: team_url})
+                    driver.close()
+                    driver.switch_to.window(window_before)
+        else:
+            print("другой спорт")
+
     def FootBall(self): # Footbal
         teams_home_array = []
         teams_away_array = []
@@ -93,8 +157,8 @@ class Parser:
 
         # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
 
-        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
      
         url = self.url + self.urls["Футбол"]
         driver.get(url)
@@ -102,7 +166,6 @@ class Parser:
         self.GetLeagues("Футбол", driver)
         soccer_bloсks = driver.find_elements_by_class_name("soccer")
         last_block = ""
-        window_before = driver.window_handles[0]
         for block in soccer_bloсks:
             country = block.find_element_by_class_name("country_part")
             tournament = block.find_element_by_class_name("tournament_part")
@@ -113,24 +176,12 @@ class Parser:
             last_block = league_string
             tbody = block.find_element_by_tag_name("tbody")
             trs = tbody.find_elements_by_tag_name("tr")
-            for el in trs:
-                el.click()
-                window_after = driver.window_handles[1]
-                driver.switch_to.window(window_after)
-                teams_url_data = driver.find_elements_by_class_name("participant-imglink")
-                for team in teams_url_data:
-                    team_name = team.text
-                    team_url = team.get_attribute("onclick")
-                    # clearing url from
-                    team_url = team_url.replace('window.open(\'', '')
-                    team_url = team_url.replace('\'); return false;', '')
-                    print(team_name, team_url)
-                    self.team_urls.update({team_name: team_url})
-                driver.close()
-                driver.switch_to.window(window_before)
+            for i in trs:
                 league_array.append(league_string)
 
-        print(self.team_urls)
+        # check number of games in league_array --  May be deleted
+        print(len(league_array))
+
         teams_home = driver.find_elements_by_class_name("padr")
         teams_away = driver.find_elements_by_class_name("padl")
         all_games_scores = driver.find_elements_by_class_name("cell_sa")
@@ -150,6 +201,21 @@ class Parser:
 
         d = {'start_time': games_start_times_array, 'game_status': games_statuses_array, 'home_team': teams_home_array,
              'score': all_games_scores_array, 'away_team': teams_away_array, 'league': league_array}
+
+        # check number of games in league_array --  May be deleted
+        print(len(d['home_team']))
+
+        # test get two teams urls
+        # расскоменти, что бы попробовать!
+        self.get_two_teams_url(d['home_team'][20], d['away_team'][20], "Футбол", driver)
+
+        # test get all teams urls
+        # расскоменти, что бы попробовать!
+        # self.get_all_teams_url("Футбол", driver)
+
+        # check the results of url parsing. May be deleted
+        print(self.team_urls)
+        print(len(self.team_urls))
         driver.close()
         return d
 
