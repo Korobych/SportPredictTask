@@ -17,6 +17,7 @@ class Parser:
             "Волейбол":"/volleyball","Гандбол":"/handball","Футзал":"/futsal",
             "Бейсбол":"/baseball","Футбол":"/"}
         self.team_urls = {}
+        self.docker = '/app/back/chromedriver'
 
     def SportToday(self,sport):
         teams_home_array = []
@@ -83,8 +84,18 @@ class Parser:
         games_statuses_array = []
         games_start_times_array = []
         league_array = []
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+
+        chrome_options = webdriver.ChromeOptions()
+
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+
+        # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
+
+        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+     
         url = self.url + self.urls["Футбол"]
         driver.get(url)
 

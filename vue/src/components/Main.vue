@@ -67,6 +67,7 @@ export default {
       this.home_team="";
       this.away_team="";
       this.score="";
+      this.league="";
       axios.post('http://localhost:5000/today',{"sport":this.change})
       .then(res=>{
         this.isActive = false
