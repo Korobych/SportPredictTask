@@ -20,8 +20,9 @@ def SportTd():
     check = sparser.Parser()
     f = check.SportToday(data["sport"])
     print(f)
-    return jsonify(start_time=f["start_time"],game_status=f["game_status"],home_team=f["home_team"],score=f["score"],away_team=f["away_team"])
+    return jsonify(start_time=f["start_time"],game_status=f["game_status"],home_team=f["home_team"],score=f["score"],
+    away_team=f["away_team"],league=f["league"])
     # return str(f)
 
 if __name__ == "__main__":
-    app.run(threaded=True)
+    app.run(host="0.0.0.0")

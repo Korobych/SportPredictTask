@@ -25,6 +25,7 @@
         <td><div v-for="i in home_team">{{ i }}</div></td>
         <td><div v-for="i in score">{{ i }}</div></td>
         <td><div v-for="i in away_team">{{ i }}</div></td>
+        <td><div v-for="i in league">{{ i }}</div></td>
       </tr>
     </table>
 </div>
@@ -45,6 +46,7 @@ export default {
       home_team:"",
       away_team:"",
       score:"",
+      league:"",
       sport:[
         "Футбол",
         "Хоккей",
@@ -74,6 +76,7 @@ export default {
         this.home_team = res.data.home_team
         this.away_team = res.data.away_team
         this.score = res.data.score
+        this.league = res.data.league
         console.log(typeof res.data)
       })
     }

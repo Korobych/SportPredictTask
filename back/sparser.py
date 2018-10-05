@@ -29,7 +29,7 @@ class Parser:
             t = self.FootBall()
             return t
 
-        driver = webdriver.Chrome('./chromedriver')
+        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
         url = self.url + self.urls[sport]
         driver.get(url)
         teams_home = driver.find_elements_by_class_name("padl")
@@ -82,7 +82,7 @@ class Parser:
         games_statuses_array = []
         games_start_times_array = []
         league_array = []
-        driver = webdriver.Chrome('./chromedriver')
+        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         url = self.url + self.urls["Футбол"]
         driver.get(url)
