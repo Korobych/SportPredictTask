@@ -12,7 +12,16 @@ team_urls={}
 
 def get_two_teams_url(team1, team2, sport, driver):
             window_before = driver.window_handles[0]
-            sport_bloсks = driver.find_elements_by_class_name("hockey")
+            find = ""
+            if sport == "Хоккей":
+                find = "hockey"
+            elif sport == "Баскетбол":
+                find = "basketball"
+            elif sport == "Бейсбол":
+                find = "baseball"
+
+            sport_bloсks = driver.find_elements_by_class_name(find)
+            
             print(sport_bloсks)
             for block in sport_bloсks[1:]:
                 tbody = block.find_element_by_tag_name("tbody")
@@ -62,7 +71,17 @@ def light_matches_info(sport, driver):
             games_statuses_array = []
             games_start_times_array = []
             # Test ###############
-            bloсks = driver.find_elements_by_class_name("hockey")
+
+            find = ""
+            if sport == "Баскетбол":
+                find = "basketball"
+            elif sport == "Хоккей":
+                find = "hockey"
+            elif sport == "Бейсбол":
+                find = "baseball"
+
+            bloсks = driver.find_elements_by_class_name(find)
+            
             last_block = ""
             for block in bloсks[1:]:
                 country = block.find_element_by_class_name("country_part")
@@ -110,29 +129,41 @@ def light_matches_info(sport, driver):
                 df.to_csv("light_football_games_info.csv", sep=';', header=True, index=False, encoding='utf-8')
                 return d
 
-def Hockey(first,second):
+def Sport(first,second,sport):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver.get("https://www.myscore.ru/hockey")
+
+
+        change = ""
+        if sport == "Хоккей":
+            change = "hockey"
+        elif sport == "Баскетбол":
+            change = "basketball"
+        elif sport == "Бейсбол":
+            change = "baseball"
+
+        url = "https://www.myscore.ru/"+change
+
+        driver.get(url)
         t.sleep(2)
         start = t.time()
-        d = light_matches_info("Хоккей", driver) # Хоккей
+        d = light_matches_info(sport, driver)
         end = t.time()
         print("время выполнения парсинга - ", end - start, " секунд.")
         if d == "Bad":
             print("BAD")
             return
         if len(first) == 0:
-            get_two_teams_url(d['home_team'][10], d['away_team'][10], "Хоккей", driver) # Хоккей
+            get_two_teams_url(d['home_team'][10], d['away_team'][10],sport, driver) 
             print(team_urls)
             print(len(team_urls))
             driver.close()
             return d
         else:
-            get_two_teams_url(first, second, "Хоккей", driver) # Хоккей
+            get_two_teams_url(first, second, sport, driver) 
             # t.sleep(10)
             print(team_urls)
             print(len(team_urls))
@@ -141,4 +172,4 @@ def Hockey(first,second):
 
 
 if __name__ == "__main__":
-    Hockey("Ирселон","Аугсбюргер")
+    Sport("Чиба","Фукуока","Бейсбол")

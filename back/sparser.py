@@ -11,7 +11,6 @@ import time as t
 
 # Today
 class Parser:
-
     def __init__(self):
         self.url = 'https://www.myscore.ru'
         self.urls = {
