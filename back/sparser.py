@@ -71,23 +71,23 @@ class Parser:
         else:
             return "Bad"
 
-    def GetLeagues(self, sport, driver):
-        if sport == "Футбол":
-            check = driver.find_elements_by_class_name("expand-league")
-            i = 0
-            while i < len(check):
-                try:
-                    check[i].click()
-                    i += 1
-                except selenium.common.exceptions.WebDriverException:
-                    i + 1
-            print("end")
-            t.sleep(2)
-            driver.execute_script("window.scrollTo(0,0);")
-            t.sleep(2)
-            return driver
-        else:
-            pass
+    # def GetLeagues(self, sport, driver):
+    #     if sport == "Футбол":
+    #         check = driver.find_elements_by_class_name("expand-league")
+    #         i = 0
+    #         while i < len(check):
+    #             try:
+    #                 check[i].click()
+    #                 i += 1
+    #             except selenium.common.exceptions.WebDriverException:
+    #                 i + 1
+    #         print("end")
+    #         t.sleep(2)
+    #         driver.execute_script("window.scrollTo(0,0);")
+    #         t.sleep(2)
+    #         return driver
+    #     else:
+    #         pass
 
     def get_all_matches_info(self, sport, driver):
         if sport == "Футбол":
@@ -197,10 +197,12 @@ class Parser:
             print(len(all_games_scores_array), 'count of scores')
             print(len(games_statuses_array), 'count of statuses')
             print(len(games_start_times_array), 'count of start_times')
+            print(league_array)
 
             d = {'start_time': games_start_times_array, 'game_status': games_statuses_array,
                  'home_team': teams_home_array,
                  'score': all_games_scores_array, 'away_team': teams_away_array, 'league': league_array}
+
             df = pnd.DataFrame(data=d)
             # saving to csv
             df.to_csv("light_football_games_info.csv", sep=';', header=True, index=False, encoding='utf-8')
@@ -323,4 +325,4 @@ class Parser:
 if __name__ == "__main__":
     full = Parser()
     test = input("Введите название спорта:")
-    full.SportToday(test, "Факел", "Мордовия")
+    full.SportToday(test, "Атлетико", "Бетис")
