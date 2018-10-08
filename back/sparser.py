@@ -146,7 +146,7 @@ class Parser:
                  'score': all_games_scores_array, 'away_team': teams_away_array, 'league': league_array}
             df = pnd.DataFrame(data=d)
             #saving to csv
-            df.to_csv("full_football_games_info.csv", sep=';', header=True, index=False, encoding='utf-8')
+            df.to_csv("full_football_games_info.csv", header=True, index=False, encoding='utf-8')
             return d
 
     def light_matches_info(self, sport, driver):
@@ -207,7 +207,7 @@ class Parser:
 
             df = pnd.DataFrame(data=d)
             # saving to csv
-            df.to_csv("light_football_games_info.csv", sep=';', header=True, index=False, encoding='utf-8')
+            df.to_csv("light_football_games_info.csv", header=True, index=False, encoding='utf-8')
             return d
         else:
             teams_home_array = []
@@ -221,13 +221,13 @@ class Parser:
             games_start_times_array = []
             # Test ###############
 
-            find = ""
-            if sport == "Баскетбол":
-                find = "basketball"
-            elif sport == "Хоккей":
-                find = "hockey"
-            elif sport == "Бейсбол":
-                find = "baseball"
+            find = self.urls[sport][1:]
+            # if sport == "Баскетбол":
+            #     find = "basketball"
+            # elif sport == "Хоккей":
+            #     find = "hockey"
+            # elif sport == "Бейсбол":
+            #     find = "baseball"
 
             bloсks = driver.find_elements_by_class_name(find)
             
@@ -274,8 +274,9 @@ class Parser:
                  'home_team': teams_home_array, 'away_team': teams_away_array,
                  'score_home':teams_home_scores,"score_away":teams_away_scores,'league':league_array}
                 df = pnd.DataFrame(data=d)
+                
                 # saving to csv
-                df.to_csv("light_football_games_info.csv", sep=';', header=True, index=False, encoding='utf-8')
+                df.to_csv("light_"+find+"_games_info.csv", header=True, index=False, encoding='utf-8')
                 return d
 
     def get_two_teams_url(self, team1, team2, sport, driver):
@@ -316,16 +317,8 @@ class Parser:
                     else:
                         print("нет такой пары команд")
         else:
-            # print("другой спорт")
-            find = self.urls[sport]
-            # if sport == "Хоккей":
-            #     find = "hockey"
-            # elif sport == "Баскетбол":
-            #     find = "basketball"
-            # elif sport == "Бейсбол":
-            #     find = "baseball"
-
-            sport_bloсks = driver.find_elements_by_class_name(find[1:])
+            find = self.urls[sport][1:]
+            sport_bloсks = driver.find_elements_by_class_name(find)
             
             print(sport_bloсks)
             for block in sport_bloсks[1:]:
@@ -450,15 +443,6 @@ class Parser:
 
 
         change = self.url + self.urls[sport]
-        # if sport == "Хоккей":
-        #     change = "hockey"
-        # elif sport == "Баскетбол":
-        #     change = "basketball"
-        # elif sport == "Бейсбол":
-        #     change = "baseball"
-
-        # url = "https://www.myscore.ru/"+change
-
         driver.get(change)
         t.sleep(2)
         start = t.time()
