@@ -39,8 +39,8 @@ class Parser:
             t = self.Sport(first,sec,sport)
             return t
 
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         url = self.url + self.urls[sport]
         driver.get(url)
         teams_home = driver.find_elements_by_class_name("padl")
@@ -95,7 +95,6 @@ class Parser:
         if sport == "Футбол":
             # init clicks
             driver = self.GetLeagues("Футбол", driver)
-
             teams_home_array = []
             teams_away_array = []
             all_games_scores_array = []
@@ -392,8 +391,8 @@ class Parser:
 
         # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
 
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
         url = self.url + self.urls["Футбол"]
         driver.get(url)
@@ -458,44 +457,24 @@ class Parser:
             print(len(self.team_urls))
             driver.close()
             return d
+    
+    def searchFootballInfo(self,teamName,url):
+            chrome_options = webdriver.ChromeOptions()
 
-    def team_detailed_info(self, sport):
-        # we already know what sport is wanted
-        # let's prepare url
-        chrome_options = webdriver.ChromeOptions()
-
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
+            chrome_options.add_argument('--headless')
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.add_argument('--disable-dev-shm-usage')
 
         # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
 
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
-
-        team_list = list(iter(self.team_urls.items()))
-        team_name1, url_c1 = team_list[0]
-        team_name2, url_c2 = team_list[1]
-        print('Начинаем собирать информацию для ', team_name1)
-        url = self.url + url_c1
-        driver.get(url)
-        t.sleep(2)
-
-        window_before = driver.window_handles[0]
-        if sport == "Футбол":
-
-            # 1-st team data collecting
-
-            # final dictionaries
-            # me_home_d = {}
-            # me_away_d = {}
-            # opponent_home_d = {}
-            # opponent_away_d = {}
-
-            #
-            # my team home arrays
-            #
-
+            driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+            print('Начинаем собирать информацию для ', teamName)
+       
+            driver.get(url)
+            t.sleep(2)
+            window_before = driver.window_handles[0]
+            ### Your part
+            
             me_home_game_name = []
             me_home_good_goals = []
             me_home_missed_goals = []
@@ -613,7 +592,7 @@ class Parser:
                 padr = tr.find_element_by_class_name('padr')
                 padl = tr.find_element_by_class_name('padl')
                 # home_df updating
-                if team_name1 == padr.text.strip():
+                if teamName == padr.text.strip():
                     tr.click()
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
@@ -628,7 +607,7 @@ class Parser:
 
                     away_team_name = driver.find_elements_by_class_name('participant-imglink')
                     # game name append
-                    game_name = team_name1 + ' - ' + away_team_name[3].text
+                    game_name = teamName + ' - ' + away_team_name[3].text
                     print(game_name)
                     me_home_game_name.append(game_name)
                     enemy_away_game_name.append(game_name)
@@ -819,7 +798,7 @@ class Parser:
                     driver.switch_to.window(window_before)
 
                 # away_df updating
-                elif team_name1 == padl.text.strip():
+                elif teamName == padl.text.strip():
                     tr.click()
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
@@ -834,7 +813,7 @@ class Parser:
 
                     home_team_name = driver.find_elements_by_class_name('participant-imglink')
                     # game name append
-                    game_name = home_team_name[1].text + ' - ' + team_name1
+                    game_name = home_team_name[1].text + ' - ' + teamName
                     print(game_name)
                     enemy_home_game_name.append(game_name)
                     me_away_game_name.append(game_name)
@@ -954,7 +933,7 @@ class Parser:
                     if (me_away_fauls[counter - 1] != '-' and me_away_yc[counter - 1] != '-' and
                         me_away_rc[counter - 1] != '-'):
                         me_away_sum_of_badthings.append((100 / int(me_away_fauls[counter - 1])) *
-                            int(me_home_yc[counter - 1]) + (100 / int(me_away_fauls[counter - 1])) *
+                            int(me_away_yc[counter - 1]) + (100 / int(me_away_fauls[counter - 1])) *
                                                         int(me_away_rc[counter - 1]))
                     else:
                         me_away_sum_of_badthings.append('-')
@@ -1038,7 +1017,7 @@ class Parser:
                          'fauls_proportion': me_home_sum_of_badthings}
 
             me_home_df = pnd.DataFrame(data=me_home_d)
-            me_home_df.to_csv("first_team_home_games.csv", header=True, index=False, encoding='utf8')
+            me_home_df.to_csv(teamName+"_team_home_games.csv", header=True, index=False, encoding='utf8')
             print(me_home_df.head())
 
             me_away_d = {'match_name': me_away_game_name, 'goals': me_away_good_goals, 'missed': me_away_missed_goals,
@@ -1051,10 +1030,10 @@ class Parser:
                          '%goals_from_kicks': me_away_percent_goals_kicks,
                          '%goals_from_targets_kicks': me_away_percent_target_goals_kicks,
                          '%blocked_kicks_by_defence': me_away_percent_enemy_blocked_kicks,
-                         'fauls_proportion': me_home_sum_of_badthings}
+                         'fauls_proportion': me_away_sum_of_badthings}
 
             me_away_df = pnd.DataFrame(data=me_away_d)
-            me_away_df.to_csv("first_team_away_games.csv", header=True, index=False, encoding='utf8')
+            me_away_df.to_csv(teamName+"_team_away_games.csv", header=True, index=False, encoding='utf8')
             print(me_away_df.head())
 
             opponent_away_d = {'match_name': enemy_away_game_name, 'goals': enemy_away_good_goals,
@@ -1073,7 +1052,7 @@ class Parser:
                          'fauls_proportion': enemy_away_sum_of_badthings}
 
             opponent_away_df = pnd.DataFrame(data=opponent_away_d)
-            opponent_away_df.to_csv("first_team_opponents_away.csv", header=True, index=False, encoding='utf8')
+            opponent_away_df.to_csv(teamName+"team_opponents_away.csv", header=True, index=False, encoding='utf8')
             print(opponent_away_df.head())
 
             opponent_home_d = {'match_name': enemy_home_game_name, 'goals': enemy_home_good_goals,
@@ -1092,22 +1071,35 @@ class Parser:
                                'fauls_proportion': enemy_home_sum_of_badthings}
 
             opponent_home_df = pnd.DataFrame(data=opponent_home_d)
-            opponent_home_df.to_csv("first_team_opponents_home.csv", header=True, index=False, encoding='utf8')
+            opponent_home_df.to_csv(teamName+"team_opponents_home.csv", header=True, index=False, encoding='utf8')
             print(opponent_home_df.head())
+
+
+    def team_detailed_info(self, sport):
+        team_list = list(iter(self.team_urls.items()))
+        team_name1, url_c1 = team_list[0]
+        team_name2, url_c2 = team_list[1]
+        url1 = self.url + url_c1
+        url2 = self.url + url_c2
+        # print('Начинаем собирать информацию для ', team_name1)
+        if sport == "Футбол":
+            self.searchFootballInfo(team_name1,url1)
+            self.searchFootballInfo(team_name2,url2)
 
             # move to team №2
             # TODO The same big process with the second team
-            print('Начинаем собирать информацию для ', team_name2)
-            url = self.url + url_c2
-            driver.get(url)
-            t.sleep(2)
+            # print('Начинаем собирать информацию для ', team_name2)
+            # url = self.url + url_c2
+            # driver.get(url)
+            # t.sleep(2)
 
-            block = driver.find_element_by_id('fs-summary-results')
-            tbody = block.find_element_by_tag_name('tbody')
-            trs = tbody.find_elements_by_tag_name('tr')
-            for tr in trs:
-                print(tr.get_attribute('innerHTML'))
-            driver.close()
+            # block = driver.find_element_by_id('fs-summary-results')
+            # tbody = block.find_element_by_tag_name('tbody')
+            # trs = tbody.find_elements_by_tag_name('tr')
+            # for tr in trs:
+            #     print(tr.get_attribute('innerHTML'))
+            # driver.close()
+
         # elif sport == "Хоккей":
         #     print('парсинг хоккейной истории игр')
 
