@@ -7,6 +7,7 @@ import selenium
 import numpy as np
 import pandas as pnd
 import time as t
+import threading
 
 
 # Today
@@ -458,12 +459,14 @@ class Parser:
             driver.close()
             return d
     
-    def searchFootballInfo(self,teamName,url):
+    def searchFootballInfo(self,teamName,url, writer):
             chrome_options = webdriver.ChromeOptions()
 
             chrome_options.add_argument('--headless')
             chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument('--disable-dev-shm-usage')
+
+            
 
         # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
 
@@ -1017,7 +1020,8 @@ class Parser:
                          'fauls_proportion': me_home_sum_of_badthings}
 
             me_home_df = pnd.DataFrame(data=me_home_d)
-            me_home_df.to_csv(teamName+"_team_home_games.csv", header=True, index=False, encoding='utf8')
+            # me_home_df.to_csv(teamName+"_team_home_games.csv", header=True, index=False, encoding='utf8')
+            me_home_df.to_excel(writer,sheet_name=teamName+"_home_games")
             print(me_home_df.head())
 
             me_away_d = {'match_name': me_away_game_name, 'goals': me_away_good_goals, 'missed': me_away_missed_goals,
@@ -1033,7 +1037,8 @@ class Parser:
                          'fauls_proportion': me_away_sum_of_badthings}
 
             me_away_df = pnd.DataFrame(data=me_away_d)
-            me_away_df.to_csv(teamName+"_team_away_games.csv", header=True, index=False, encoding='utf8')
+            # me_away_df.to_csv(teamName+"_team_away_games.csv", header=True, index=False, encoding='utf8')
+            me_away_df.to_excel(writer,sheet_name=teamName+"_away_games")
             print(me_away_df.head())
 
             opponent_away_d = {'match_name': enemy_away_game_name, 'goals': enemy_away_good_goals,
@@ -1052,7 +1057,8 @@ class Parser:
                          'fauls_proportion': enemy_away_sum_of_badthings}
 
             opponent_away_df = pnd.DataFrame(data=opponent_away_d)
-            opponent_away_df.to_csv(teamName+"team_opponents_away.csv", header=True, index=False, encoding='utf8')
+            # opponent_away_df.to_csv(teamName+"_team_opp_away.csv", header=True, index=False, encoding='utf8')
+            opponent_away_df.to_excel(writer,sheet_name=teamName+"_opp_away")
             print(opponent_away_df.head())
 
             opponent_home_d = {'match_name': enemy_home_game_name, 'goals': enemy_home_good_goals,
@@ -1071,8 +1077,10 @@ class Parser:
                                'fauls_proportion': enemy_home_sum_of_badthings}
 
             opponent_home_df = pnd.DataFrame(data=opponent_home_d)
-            opponent_home_df.to_csv(teamName+"team_opponents_home.csv", header=True, index=False, encoding='utf8')
+            # opponent_home_df.to_csv(teamName+"_team_opponents_home.csv", header=True, index=False, encoding='utf8')
+            opponent_home_df.to_excel(writer,sheet_name=teamName+"_opp_home")
             print(opponent_home_df.head())
+            # writer.save()
 
 
     def team_detailed_info(self, sport):
@@ -1083,8 +1091,19 @@ class Parser:
         url2 = self.url + url_c2
         # print('Начинаем собирать информацию для ', team_name1)
         if sport == "Футбол":
-            self.searchFootballInfo(team_name1,url1)
-            self.searchFootballInfo(team_name2,url2)
+            writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
+            try:
+                # self.searchFootballInfo(team_name1,url1, writer)
+                # self.searchFootballInfo(team_name2,url2,writer)
+
+                 t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
+                 t2 = threading.Thread(target=self.searchFootballInfo,args=(team_name2,url2,writer))
+                 t1.start()
+                 t2.start()
+                 t1.join()
+                 t2.join()
+            finally:
+                writer.close()
 
             # move to team №2
             # TODO The same big process with the second team
