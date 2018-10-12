@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pnd
 import time as t
 import threading
+import subprocess
 
 
 # Today
@@ -32,7 +33,7 @@ class Parser:
         if sport == "Футбол":
             if len(first) == 0:
                 t = self.FootBall()
-                return t
+                return 
             else:
                 t = self.FootBall(first, sec)
                 return t
@@ -40,39 +41,45 @@ class Parser:
             t = self.Sport(first,sec,sport)
             return t
 
-        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
-        url = self.url + self.urls[sport]
-        driver.get(url)
-        teams_home = driver.find_elements_by_class_name("padl")
-        i = 0
-        while i < len(teams_home):
-            teams_home_array += [teams_home[i].text]
-            teams_away_array += [teams_home[i + 1].text]
-            i += 2
+        # chrome_options = webdriver.ChromeOptions()
+        # chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--no-sandbox')
+        # chrome_options.add_argument('--disable-dev-shm-usage')
 
-        if len(teams_away_array) == len(teams_home_array) and len(teams_away_array) > 0:
-            games_scores_home = driver.find_elements_by_class_name("cell_sc")
-            games_scores_away = driver.find_elements_by_class_name("cell_ta")
-            games_statuses = driver.find_elements_by_class_name("cell_aa")
-            games_start_times = driver.find_elements_by_class_name("cell_ad")
+        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
+        # # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        # url = self.url + self.urls[sport]
+        # driver.get(url)
+        # teams_home = driver.find_elements_by_class_name("padl")
+        # i = 0
+        # while i < len(teams_home):
+        #     teams_home_array += [teams_home[i].text]
+        #     teams_away_array += [teams_home[i + 1].text]
+        #     i += 2
 
-            for score in games_scores_home:
-                teams_home_scores.append(score.text.replace('\xa0', ''))
-            for score in games_scores_away:
-                teams_away_scores.append(score.text.replace('\xa0', ''))
-            for game in games_statuses:
-                games_statuses_array.append(game.text)
-            for time in games_start_times:
-                games_start_times_array.append(time.text)
+        # if len(teams_away_array) == len(teams_home_array) and len(teams_away_array) > 0:
+        #     games_scores_home = driver.find_elements_by_class_name("cell_sc")
+        #     games_scores_away = driver.find_elements_by_class_name("cell_ta")
+        #     games_statuses = driver.find_elements_by_class_name("cell_aa")
+        #     games_start_times = driver.find_elements_by_class_name("cell_ad")
 
-            d = {'start_time': games_start_times_array, 'game_status': games_statuses_array,
-                 'home_team': teams_home_array,
-                 'score_home': teams_home_scores, 'score_away': teams_away_scores, 'away_team': teams_away_array}
-            # todayDataFrame = pnd.DataFrame(data = d)
-            # print(todayDataFrame)
-        else:
-            return "Bad"
+        #     for score in games_scores_home:
+        #         teams_home_scores.append(score.text.replace('\xa0', ''))
+        #     for score in games_scores_away:
+        #         teams_away_scores.append(score.text.replace('\xa0', ''))
+        #     for game in games_statuses:
+        #         games_statuses_array.append(game.text)
+        #     for time in games_start_times:
+        #         games_start_times_array.append(time.text)
+
+        #     d = {'start_time': games_start_times_array, 'game_status': games_statuses_array,
+        #          'home_team': teams_home_array,
+        #          'score_home': teams_home_scores, 'score_away': teams_away_scores, 'away_team': teams_away_array}
+        #     # todayDataFrame = pnd.DataFrame(data = d)
+        #     # print(todayDataFrame)
+        #     return 
+        # else:
+        #     return "Bad"
 
     # def GetLeagues(self, sport, driver):
     #     if sport == "Футбол":
@@ -313,7 +320,7 @@ class Parser:
                             self.team_urls.update({team_name: team_url})
                         driver.close()
                         driver.switch_to.window(window_before)
-                        return
+                        return 
                     else:
                         print("нет такой пары команд")
         else:
@@ -390,9 +397,9 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
+        driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
 
-        driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
+        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
         url = self.url + self.urls["Футбол"]
@@ -403,27 +410,34 @@ class Parser:
 
         # call for data grabbing func. Light version
         d = self.light_matches_info("Футбол", driver)
-
         # Full version
         # d = self.get_all_matches_info("Футбол", driver)
-
         end = t.time()
         print("время выполнения парсинга - ", end - start, " секунд.")
-
+        if d == "Bad":
+            print("BAD")
+            return "bad"
         if len(first) == 0:
             self.get_two_teams_url(d['home_team'][0], d['away_team'][0], "Футбол", driver)
             # t.sleep(10)
             print(self.team_urls)
             print(len(self.team_urls))
             driver.close()
-            return d
+            if len(self.team_urls)==0:
+                return "bad"
+            else: 
+                return "nice"
         else:
             self.get_two_teams_url(first, sec, "Футбол", driver)
             # t.sleep(10)
             print(self.team_urls)
             print(len(self.team_urls))
             driver.close()
-            return d
+            if len(self.team_urls)==0:
+                return "bad"
+            else: 
+                return "nice"
+
 
     def Sport(self,first,second,sport):
 
@@ -432,8 +446,9 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        driver = webdriver.Chrome(self.docker,chrome_options=chrome_options)
+        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
+        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
         change = self.url + self.urls[sport]
         driver.get(change)
@@ -444,20 +459,26 @@ class Parser:
         print("время выполнения парсинга - ", end - start, " секунд.")
         if d == "Bad":
             print("BAD")
-            return
+            return "bad"
         if len(first) == 0:
             self.get_two_teams_url(d['home_team'][10], d['away_team'][10],sport, driver) 
             print(self.team_urls)
             print(len(self.team_urls))
             driver.close()
-            return d
+            if len(self.team_urls)==0:
+                return "bad"
+            else: 
+                return "nice"
         else:
             self.get_two_teams_url(first, second, sport, driver) 
             # t.sleep(10)
             print(self.team_urls)
             print(len(self.team_urls))
             driver.close()
-            return d
+            if len(self.team_urls)==0:
+                return "bad"
+            else: 
+                return "nice"
     
     def searchFootballInfo(self, teamName, url, writer):
         chrome_options = webdriver.ChromeOptions()
@@ -465,10 +486,11 @@ class Parser:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-        # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
+        
+        driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
 
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
+        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         print('Начинаем собирать информацию для ', teamName)
 
         driver.get(url)
@@ -1088,10 +1110,10 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        # driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
+        driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
 
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver')
-        driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
+        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
+        # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
         print('Начинаем собирать информацию для ', teamName)
 
@@ -1940,6 +1962,9 @@ class Parser:
 
 
     def team_detailed_info(self, sport):
+        print(self.team_urls)
+        if len(self.team_urls) == 0:
+            return "bad"
         team_list = list(iter(self.team_urls.items()))
         team_name1, url_c1 = team_list[0]
         team_name2, url_c2 = team_list[1]
@@ -1949,25 +1974,31 @@ class Parser:
         if sport == "Футбол":
             writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
             try:
+                 subprocess.call("rm *xlsx",shell=True)
                  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
                  t2 = threading.Thread(target=self.searchFootballInfo,args=(team_name2,url2,writer))
                  t1.start()
                  t2.start()
                  t1.join()
                  t2.join()
+                 return "ok"
             finally:
                 writer.close()
+                # subprocess.call("rm ../vue/dist/static/*.xlsx;mv Football.xlsx ../vue/dist/static/",shell=True)
         elif sport == "Хоккей":
             writer = pnd.ExcelWriter('Hockey.xlsx', engine='xlsxwriter')
             try:
+                subprocess.call("rm *xlsx",shell=True)
                 t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
                 t2 = threading.Thread(target=self.searchHockeyInfo, args=(team_name2, url2, writer))
                 t1.start()
                 t2.start()
                 t1.join()
                 t2.join()
+                return "ok"
             finally:
-                writer.close()
+                writer.close() 
+                
 
 
 
@@ -1976,6 +2007,5 @@ if __name__ == "__main__":
     test = input("Спорт:")
     first = input("Первая команда:")
     second = input("Вторая команда:")
-
     full.SportToday(test, first, second)
     full.team_detailed_info(test)

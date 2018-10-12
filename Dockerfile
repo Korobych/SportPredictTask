@@ -21,7 +21,7 @@ RUN  apt-get install -yq \
     libgconf-2-4=3.2.6-4+b1 \
     libfontconfig1=2.11.0-6.7+b1
 
-RUN  pip install pandas requests_html bs4 flask selenium
+RUN  pip install pandas requests_html bs4 flask selenium xlsxwriter
 RUN apt-get install -y 
 EXPOSE 5000
 CMD ["python3.6","/app/back/app.py"]

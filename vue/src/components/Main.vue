@@ -4,20 +4,37 @@
   <div class="head">
     <h2 class="name">{{msg}}</h2>
    <form class="form-inline">
-    <input v-model="fcommand" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search">
-    <input v-model="scommand" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search">
-    <button class="btn btn-outline-success my-2 my-sm-0">Найти</button>  
+    <input v-model="firstTeam" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search">
+    <input v-model="secondTeam" class="form-control mr-sm-2" type="search" placeholder="Команда" aria-label="Search">
      <select  v-model="change" class="form-control change">
      <option  v-for="i in sport" :key="i" >{{ i }}</option>
     </select>  
+    <p class="excp">{{excepInfo}}</p>
   </form>
-    <div class="sbut">
-      <button  @click="Parse()" class="btn btn-outline-success my-2 my-sm-0">Сегодня</button> 
-  </div>
+<div class="secondButton">
+      <button @click="TwoTeams()" class="btn btn-outline-success my-2 my-sm-0">Найти</button>
+</div>
     
+<!-- <div class="sbut ">
+      <button  @click="Parse()" class="btn btn-outline-success my-2 my-sm-0">Сегодня</button> 
+</div> -->
+
   </div>
 </nav>
 <div v-bind:class="{ loader: isActive }"></div>
+
+
+<div v-bind:class="{ excel: !excelReady }">
+<center><p>Скачайте файл Excel - <a v-bind:href="filename" download><img src="static/excel.png" width="50" height="50" alt=""></a></p></center>
+<!-- <center><a href="#" class="button2" tabindex="0">кнопка</a></center> -->
+<div class="elfib">
+<a class="btnflip" href="">
+		<span class="btnflip-item btnflip__front">Elliot</span>
+		<span class="btnflip-item btnflip__center"></span>
+		<span class="btnflip-item btnflip__back">Fibonacci</span>
+</a>
+</div>
+</div>
   <table class="tab" cellspacing="5">
       <tr>
         <td><div v-for="i in time">{{ i }}</div></td>
@@ -33,41 +50,48 @@
 
 <script>
 import axios from "axios"
-
 export default {
   name: 'Main',
   data () {
     return {
-      msg: 'Elliott Fibonacci',
+      msg: 'Elliot Fibonacci',
       change:"",
       isActive:false,
+      excelReady : false,
       time:"",
       status:"",
       home_team:"",
       away_team:"",
+      firstTeam:"",
+      secondTeam:"",
+      filename:"",
       score:"",
       league:"",
+      excepInfo:"",
       sport:[
         "Футбол",
         "Хоккей",
-        "Теннис",
-        "Баскетбол",
-        "Волейбол",
-        "Гандбол",
-        "Футзал",
-        "Бейсбол"
+        // "Теннис",
+        // "Баскетбол",
+        // "Волейбол",
+        // "Гандбол",
+        // "Футзал",
+        // "Бейсбол"
       ]
     }
   },
   methods:{
     Parse(){
       this.isActive = true;
+      this.excelReady = false;
       this.time="";
       this.status="";
       this.home_team="";
       this.away_team="";
       this.score="";
       this.league="";
+      this.excepInfo = "";
+
       axios.post('http://localhost:5000/today',{"sport":this.change})
       .then(res=>{
         this.isActive = false
@@ -80,11 +104,73 @@ export default {
         this.league = res.data.league
         console.log(typeof res.data)
       })
+    },
+    TwoTeams(){
+      this.isActive = true;
+      this.excelReady = false;
+      this.filename = "";
+      this.excepInfo = "";
+      this.time="";
+      this.status="";
+      this.home_team="";
+      this.away_team="";
+      this.score="";
+      this.league="";
+      this.excepInfo = "Начался поиск команд";
+      axios.post("http://localhost:5000/teams",{"sport":this.change,"first":this.firstTeam,"second":this.secondTeam})
+      .then(res=>{
+        // console.log(res.data)
+        if(res.data.info=="nice"){
+          this.excepInfo = "Команды найдены.Подготавливается excel для скачивания"
+          axios.post("http://localhost:5000/excel",{"sport":this.change})
+          .then(res=>{
+            if(res.data.info=="ok"){
+                console.log("OK")
+                this.isActive = false;
+                if(this.change=="Футбол"){
+                  this.filename = "/downloadfile/Football.xlsx"
+                  this.excelReady = true;
+                  // console.log(this.filename)
+                  this.excepInfo =""
+                }else if(this.change=="Хоккей"){
+                  this.filename = "/downloadfile/Hockey.xlsx"
+                  this.excelReady = true;
+                  // console.log(this.filename)
+                  this.excepInfo = ""
+                }
+            }else{
+                console.log("BAD")
+                this.isActive = false;
+                this.excepInfo = "К сожалению что-то пошло не так"
+            }
+          })
+        }else{
+          this.isActive = false;
+          this.excepInfo = "К сожалению команды не удалось найти.\n Попробуйте проверить правильность написания команд, а также выбор спорта"
+        }
+      })
     }
   }
 }
 </script>
 <style>
+
+.elfib{
+  margin-left: 800px;
+  margin-top: 200px;
+  /* margin: auto; */
+  position: fixed;
+}
+.excp{
+  color: #5FDB5C;
+}
+.excel{
+  visibility: hidden;
+}
+.excCenter{
+  margin-left:800px;
+  margin-top: 200px;
+}
 .head{
   margin-left: 35%;
 }
@@ -109,10 +195,18 @@ export default {
 }
 .sbut{
   margin-left:150px;
-  margin-top:-37px;
+  margin-top:-75px;
 }
 
-
+.secondButton{
+  /* margin-left: 500px; */
+  margin-bottom: 100px;
+  margin-top:-104px;
+  margin-right: 200px;
+  margin-left: 500px;
+  /* visibility: hidden; */
+  /* background-color: aquamarine; */
+}
 
 .loader,
 .loader:before,
@@ -174,5 +268,65 @@ export default {
   }
 }
 
+
+/*Fibbonacci button*/
+.btnflip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 60px;
+  text-align: center;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  transform-origin: center center;
+}
+.btnflip-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  line-height: 60px;
+  font-size: 24px;
+  background-color: rgba(255,255,255, .05);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  border-radius: 30px;
+  text-transform: uppercase;
+  color: #fff;
+  transition: 1s;
+}
+.btnflip-item.btnflip__front {
+  transform: rotateX(0deg) translateZ(20px);
+}
+.btnflip:hover .btnflip-item.btnflip__front {
+  transform: rotateX(-180deg) translateZ(20px);
+}
+.btnflip-item.btnflip__back {
+  transform: rotateX(180deg) translateZ(20px);
+}
+.btnflip:hover .btnflip-item.btnflip__back {
+  transform: rotateX(0deg) translateZ(20px);
+}
+.btnflip-item.btnflip__center {
+  background: linear-gradient(to left, #c31a5b, #7129bd);
+}
+.btnflip-item.btnflip__center::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to left, #ffdd1f, #c31a5b);
+  border-radius: 30px;
+  transform: translateZ(-1px);
+}
+.btnflip:hover .btnflip-item.btnflip__center {
+  transform: rotateX(-180deg);
+}
 
 </style>
