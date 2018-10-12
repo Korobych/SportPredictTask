@@ -657,44 +657,117 @@ class Parser:
                     away_value = group.find_element_by_css_selector('.statText.statText--awayValue')
 
                     if param_name.text == "Владение мячом":
-                        me_home_ball_control.append(home_value.text)
-                        enemy_away_ball_control.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_ball_control.append('0')
+                        else:
+                            me_home_ball_control.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_ball_control.append('0')
+                        else:
+                            enemy_away_ball_control.append(away_value.text)
                     if param_name.text == "Удары":
-                        me_home_own_ball_hits.append(home_value.text)
-                        me_home_enemy_ball_hits.append(away_value.text)
-
-                        enemy_away_own_ball_hits.append(away_value.text)
-                        enemy_away_me_ball_hits.append(home_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_own_ball_hits.append('0')
+                            enemy_away_me_ball_hits.append('0')
+                        else:
+                            me_home_own_ball_hits.append(home_value.text)
+                            enemy_away_me_ball_hits.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_home_enemy_ball_hits.append('0')
+                            enemy_away_own_ball_hits.append('0')
+                        else:
+                            me_home_enemy_ball_hits.append(away_value.text)
+                            enemy_away_own_ball_hits.append(away_value.text)
                     if param_name.text == "Удары в створ":
-                        me_home_own_target_ball_hits.append(home_value.text)
-                        enemy_away_own_target_ball_hits.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_own_target_ball_hits.append('0')
+                        else:
+                            me_home_own_target_ball_hits.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_own_target_ball_hits.append('0')
+                        else:
+                            enemy_away_own_target_ball_hits.append(away_value.text)
                     if param_name.text == "Удары мимо":
-                        me_home_own_missed_ball_hits.append(home_value.text)
-                        enemy_away_own_missed_ball_hits.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_own_missed_ball_hits.append('0')
+                        else:
+                            me_home_own_missed_ball_hits.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_own_missed_ball_hits.append('0')
+                        else:
+                            enemy_away_own_missed_ball_hits.append(away_value.text)
                     if param_name.text == "Блок-но ударов":
-                        me_home_enemy_blocked_hits.append(away_value.text)
-                        enemy_away_me_blocked_hits.append(home_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_away_me_blocked_hits.append('0')
+                        else:
+                            enemy_away_me_blocked_hits.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_home_enemy_blocked_hits.append('0')
+                        else:
+                            me_home_enemy_blocked_hits.append(away_value.text)
                     if param_name.text == "Штрафные":
-                        me_home_standarts.append(home_value.text)
-                        enemy_away_standarts.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_standarts.append('0')
+                        else:
+                            me_home_standarts.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_standarts.append('0')
+                        else:
+                            enemy_away_standarts.append(away_value.text)
                     if param_name.text == "Угловые":
-                        me_home_corner_kicks.append(home_value.text)
-                        enemy_away_corner_kicks.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_corner_kicks.append('0')
+                        else:
+                            me_home_corner_kicks.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_corner_kicks.append('0')
+                        else:
+                            enemy_away_corner_kicks.append(away_value.text)
                     if param_name.text == "Офсайды":
-                        me_home_offsides.append(home_value.text)
-                        enemy_away_offsides.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_offsides.append('0')
+                        else:
+                            me_home_offsides.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_offsides.append('0')
+                        else:
+                            enemy_away_offsides.append(away_value.text)
                     if param_name.text == "Сэйвы":
-                        me_home_saves.append(home_value.text)
-                        enemy_away_saves.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_saves.append('0')
+                        else:
+                            me_home_saves.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_saves.append('0')
+                        else:
+                            enemy_away_saves.append(away_value.text)
                     if param_name.text == "Фолы":
-                        me_home_fauls.append(home_value.text)
-                        enemy_away_fauls.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_fauls.append('0')
+                        else:
+                            me_home_fauls.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_fauls.append('0')
+                        else:
+                            enemy_away_fauls.append(away_value.text)
                     if param_name.text == "Желтые карточки":
-                        me_home_yc.append(home_value.text)
-                        enemy_away_yc.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_yc.append('0')
+                        else:
+                            me_home_yc.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_yc.append('0')
+                        else:
+                            enemy_away_yc.append(away_value.text)
                     if param_name.text == "Красные карточки":
-                        me_home_rc.append(home_value.text)
-                        enemy_away_rc.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_home_rc.append('0')
+                        else:
+                            me_home_rc.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_away_rc.append('0')
+                        else:
+                            enemy_away_rc.append(away_value.text)
 
                 counter = len(me_home_game_name)
 
@@ -735,20 +808,21 @@ class Parser:
                 # calculated arrays
                 me_home_percent_goals_kicks.append((100 / int(me_home_own_ball_hits[counter - 1])) *
                                                     int(me_home_good_goals[counter - 1]))
-                if me_home_own_target_ball_hits[counter - 1] != "-":
+                if me_home_own_target_ball_hits[counter - 1] != '-' and me_home_own_target_ball_hits[counter - 1] != '0':
                     me_home_percent_target_goals_kicks.append((100 / int(me_home_own_target_ball_hits[counter - 1]))
                                                                * int(me_home_good_goals[counter - 1]))
                 else:
                     me_home_percent_target_goals_kicks.append('-')
 
-                if me_home_enemy_ball_hits[counter - 1 ] != '-' and  me_home_enemy_blocked_hits[counter - 1] != '-':
+                if (me_home_enemy_ball_hits[counter - 1] != '-' and me_home_enemy_blocked_hits[counter - 1] != '-'
+                        and me_home_enemy_ball_hits[counter - 1] != '0'):
                     me_home_percent_enemy_blocked_kicks.append((100 / int(me_home_enemy_ball_hits[counter - 1])) *
                                                     int(me_home_enemy_blocked_hits[counter - 1]))
                 else:
                     me_home_percent_enemy_blocked_kicks.append('-')
 
                 if (me_home_fauls[counter - 1] != '-' and me_home_yc[counter - 1] != '-' and
-                    me_home_rc[counter - 1] != '-'):
+                    me_home_rc[counter - 1] != '-' and me_home_fauls[counter - 1] != '0'):
                     me_home_sum_of_badthings.append((100 / int(me_home_fauls[counter - 1])) *
                         int(me_home_yc[counter - 1]) + (100 / int(me_home_fauls[counter - 1])) *
                                                     int(me_home_rc[counter - 1]))
@@ -795,20 +869,22 @@ class Parser:
 
                 enemy_away_percent_goals_kicks.append((100 / int(enemy_away_own_ball_hits[counter - 1])) *
                                                    int(enemy_away_good_goals[counter - 1]))
-                if enemy_away_own_target_ball_hits[counter - 1] != "-":
+                if (enemy_away_own_target_ball_hits[counter - 1] != '-' and
+                        enemy_away_own_target_ball_hits[counter - 1] != '0'):
                     enemy_away_percent_target_goals_kicks.append((100 / int(enemy_away_own_target_ball_hits[counter - 1]))
                                                               * int(enemy_away_good_goals[counter - 1]))
                 else:
                     enemy_away_percent_target_goals_kicks.append('-')
 
-                if enemy_away_me_ball_hits[counter - 1] != '-' and enemy_away_me_blocked_hits[counter - 1] != '-':
+                if (enemy_away_me_ball_hits[counter - 1] != '-' and enemy_away_me_blocked_hits[counter - 1] != '-'
+                        and enemy_away_me_ball_hits[counter - 1] != '0'):
                     enemy_away_percent_me_blocked_kicks.append((100 / int(enemy_away_me_ball_hits[counter - 1])) *
                                                                int(enemy_away_me_blocked_hits[counter - 1]))
                 else:
                     enemy_away_percent_me_blocked_kicks.append('-')
 
                 if (enemy_away_fauls[counter - 1] != '-' and enemy_away_yc[counter - 1] != '-' and
-                        enemy_away_rc[counter - 1] != '-'):
+                        enemy_away_rc[counter - 1] != '-' and enemy_away_fauls[counter - 1] != '0'):
                     enemy_away_sum_of_badthings.append((100 / int(enemy_away_fauls[counter - 1])) *
                                                     int(enemy_away_yc[counter - 1]) + (
                                                                 100 / int(enemy_away_fauls[counter - 1])) *
@@ -863,44 +939,117 @@ class Parser:
                     away_value = group.find_element_by_css_selector('.statText.statText--awayValue')
 
                     if param_name.text == "Владение мячом":
-                        enemy_home_ball_control.append(home_value.text)
-                        me_away_ball_control.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_ball_control.append('0')
+                        else:
+                            enemy_home_ball_control.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_ball_control.append('0')
+                        else:
+                            me_away_ball_control.append(away_value.text)
                     if param_name.text == "Удары":
-                        enemy_home_own_ball_hits.append(home_value.text)
-                        enemy_home_me_ball_hits.append(away_value.text)
-
-                        me_away_own_ball_hits.append(away_value.text)
-                        me_away_enemy_ball_hits.append(home_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_own_ball_hits.append('0')
+                            me_away_enemy_ball_hits.append('0')
+                        else:
+                            enemy_home_own_ball_hits.append(home_value.text)
+                            me_away_enemy_ball_hits.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_home_me_ball_hits.append('0')
+                            me_away_own_ball_hits.append('0')
+                        else:
+                            enemy_home_me_ball_hits.append(away_value.text)
+                            me_away_own_ball_hits.append(away_value.text)
                     if param_name.text == "Удары в створ":
-                        enemy_home_own_target_ball_hits.append(home_value.text)
-                        me_away_own_target_ball_hits.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_own_target_ball_hits.append('0')
+                        else:
+                            enemy_home_own_target_ball_hits.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_own_target_ball_hits.append('0')
+                        else:
+                            me_away_own_target_ball_hits.append(away_value.text)
                     if param_name.text == "Удары мимо":
-                        enemy_home_own_missed_ball_hits.append(home_value.text)
-                        me_away_own_missed_ball_hits.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_own_missed_ball_hits.append('0')
+                        else:
+                            enemy_home_own_missed_ball_hits.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_own_missed_ball_hits.append('0')
+                        else:
+                            me_away_own_missed_ball_hits.append(away_value.text)
                     if param_name.text == "Блок-но ударов":
-                        enemy_home_me_blocked_hits.append(away_value.text)
-                        me_away_enemy_blocked_hits.append(home_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            me_away_enemy_blocked_hits.append('0')
+                        else:
+                            me_away_enemy_blocked_hits.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            enemy_home_me_blocked_hits.append('0')
+                        else:
+                            enemy_home_me_blocked_hits.append(away_value.text)
                     if param_name.text == "Штрафные":
-                        enemy_home_standarts.append(home_value.text)
-                        me_away_standarts.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_standarts.append('0')
+                        else:
+                            enemy_home_standarts.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_standarts.append('0')
+                        else:
+                            me_away_standarts.append(away_value.text)
                     if param_name.text == "Угловые":
-                        enemy_home_corner_kicks.append(home_value.text)
-                        me_away_corner_kicks.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_corner_kicks.append('0')
+                        else:
+                            enemy_home_corner_kicks.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_corner_kicks.append('0')
+                        else:
+                            me_away_corner_kicks.append(away_value.text)
                     if param_name.text == "Офсайды":
-                        enemy_home_offsides.append(home_value.text)
-                        me_away_offsides.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_offsides.append('0')
+                        else:
+                            enemy_home_offsides.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_offsides.append('0')
+                        else:
+                            me_away_offsides.append(away_value.text)
                     if param_name.text == "Сэйвы":
-                        enemy_home_saves.append(home_value.text)
-                        me_away_saves.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_saves.append('0')
+                        else:
+                            enemy_home_saves.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_saves.append('0')
+                        else:
+                            me_away_saves.append(away_value.text)
                     if param_name.text == "Фолы":
-                        enemy_home_fauls.append(home_value.text)
-                        me_away_fauls.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_fauls.append('0')
+                        else:
+                            enemy_home_fauls.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_fauls.append('0')
+                        else:
+                            me_away_fauls.append(away_value.text)
                     if param_name.text == "Желтые карточки":
-                        enemy_home_yc.append(home_value.text)
-                        me_away_yc.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_yc.append('0')
+                        else:
+                            enemy_home_yc.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_yc.append('0')
+                        else:
+                            me_away_yc.append(away_value.text)
                     if param_name.text == "Красные карточки":
-                        enemy_home_rc.append(home_value.text)
-                        me_away_rc.append(away_value.text)
+                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                            enemy_home_rc.append('0')
+                        else:
+                            enemy_home_rc.append(home_value.text)
+                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                            me_away_rc.append('0')
+                        else:
+                            me_away_rc.append(away_value.text)
 
                 counter = len(me_away_game_name)
 
@@ -941,20 +1090,22 @@ class Parser:
                 # calculated arrays
                 me_away_percent_goals_kicks.append((100 / int(me_away_own_ball_hits[counter - 1])) *
                                                     int(me_away_good_goals[counter - 1]))
-                if me_away_own_target_ball_hits[counter - 1] != "-":
+                if (me_away_own_target_ball_hits[counter - 1] != '-' and
+                        me_away_own_target_ball_hits[counter - 1] != '0'):
                     me_away_percent_target_goals_kicks.append((100 / int(me_away_own_target_ball_hits[counter - 1]))
                                                                * int(me_away_good_goals[counter - 1]))
                 else:
                     me_away_percent_target_goals_kicks.append('-')
 
-                if me_away_enemy_ball_hits[counter - 1 ] != '-' and  me_away_enemy_blocked_hits[counter - 1] != '-':
+                if (me_away_enemy_ball_hits[counter - 1 ] != '-' and  me_away_enemy_blocked_hits[counter - 1] != '-'
+                        and me_away_enemy_ball_hits[counter - 1 ] != '0'):
                     me_away_percent_enemy_blocked_kicks.append((100 / int(me_away_enemy_ball_hits[counter - 1])) *
                                                     int(me_away_enemy_blocked_hits[counter - 1]))
                 else:
                     me_away_percent_enemy_blocked_kicks.append('-')
 
                 if (me_away_fauls[counter - 1] != '-' and me_away_yc[counter - 1] != '-' and
-                    me_away_rc[counter - 1] != '-'):
+                    me_away_rc[counter - 1] != '-' and me_away_fauls[counter - 1] != '0'):
                     me_away_sum_of_badthings.append((100 / int(me_away_fauls[counter - 1])) *
                         int(me_away_yc[counter - 1]) + (100 / int(me_away_fauls[counter - 1])) *
                                                     int(me_away_rc[counter - 1]))
@@ -1001,21 +1152,23 @@ class Parser:
 
                 enemy_home_percent_goals_kicks.append((100 / int(enemy_home_own_ball_hits[counter - 1])) *
                                                       int(enemy_home_good_goals[counter - 1]))
-                if enemy_home_own_target_ball_hits[counter - 1] != "-":
+                if (enemy_home_own_target_ball_hits[counter - 1] != '-' and
+                        enemy_home_own_target_ball_hits[counter - 1] != '0'):
                     enemy_home_percent_target_goals_kicks.append(
                         (100 / int(enemy_home_own_target_ball_hits[counter - 1]))
                         * int(enemy_home_good_goals[counter - 1]))
                 else:
                     enemy_home_percent_target_goals_kicks.append('-')
 
-                if enemy_home_me_ball_hits[counter - 1] != '-' and enemy_home_me_blocked_hits[counter - 1] != '-':
+                if (enemy_home_me_ball_hits[counter - 1] != '-' and enemy_home_me_blocked_hits[counter - 1] != '-'
+                        and enemy_home_me_ball_hits[counter - 1] != '0'):
                     enemy_home_percent_me_blocked_kicks.append((100 / int(enemy_home_me_ball_hits[counter - 1])) *
                                                                int(enemy_home_me_blocked_hits[counter - 1]))
                 else:
                     enemy_home_percent_me_blocked_kicks.append('-')
 
                 if (enemy_home_fauls[counter - 1] != '-' and enemy_home_yc[counter - 1] != '-' and
-                        enemy_home_rc[counter - 1] != '-'):
+                        enemy_home_rc[counter - 1] != '-' and enemy_home_fauls[counter - 1] != '0'):
                     enemy_home_sum_of_badthings.append((100 / int(enemy_home_fauls[counter - 1])) *
                                                        int(enemy_home_yc[counter - 1]) + (
                                                                100 / int(enemy_home_fauls[counter - 1])) *
