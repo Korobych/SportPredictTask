@@ -20,7 +20,9 @@ class Parser:
             "Волейбол": "/volleyball", "Гандбол": "/handball", "Футзал": "/futsal",
             "Бейсбол": "/baseball", "Футбол": "/"}
         self.team_urls = {}
-        self.docker = '/app/back/chromedriver'
+        self.selDriver = '/app/back/chromedriver'  # for run
+        # '/home/prazd/selenium/chromedriver' # for prazd
+        # '/app/back/chromedriver' # for docker
 
     def SportToday(self, sport, first, sec):
         teams_home_array = []
@@ -397,8 +399,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
-
+        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        # driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -445,8 +447,8 @@ class Parser:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-
-        driver = webdriver.Chrome(self.docker,chrome_options=chrome_options)
+        # driver = webdriver.Chrome(self.selDriver)
+        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -487,8 +489,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         
-        driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
-
+        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        # driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         print('Начинаем собирать информацию для ', teamName)
@@ -616,7 +618,13 @@ class Parser:
             padl = tr.find_element_by_class_name('padl')
             # home_df updating
             if teamName == padr.text.strip():
-                tr.click()
+
+                try:
+                    tr.click()
+                except selenium.common.exceptions.StaleElementReferenceException: 
+                    print("Unclick")
+                    continue
+
                 window_after = driver.window_handles[1]
                 driver.switch_to.window(window_after)
                 t.sleep(2)
@@ -634,9 +642,18 @@ class Parser:
                 print(game_name)
                 me_home_game_name.append(game_name)
                 enemy_away_game_name.append(game_name)
-
-                stats.click()
-                t.sleep(2)
+                
+                ############## for unclick
+                try:
+                    stats.click()
+                    t.sleep(2)
+                except selenium.common.exceptions.ElementNotVisibleException:
+                    t.sleep(2)
+                    stats.click()
+                    t.sleep(2)
+                except selenium.common.exceptions.StaleElementReferenceException: 
+                    print("Unclick")
+                    continue
 
                 # goals detection
                 score = driver.find_elements_by_class_name('scoreboard')
@@ -917,8 +934,16 @@ class Parser:
                 enemy_home_game_name.append(game_name)
                 me_away_game_name.append(game_name)
 
-                stats.click()
-                t.sleep(2)
+                try:
+                    stats.click()
+                    t.sleep(2)
+                except selenium.common.exceptions.StaleElementReferenceException:
+                    print("...")
+                    continue
+                except selenium.common.exceptions.ElementNotVisibleException:
+                    t.sleep(2)
+                    stats.click()
+                    t.sleep(2)
 
                 # goals detection
                 score = driver.find_elements_by_class_name('scoreboard')
@@ -1263,8 +1288,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        driver = webdriver.Chrome(self.docker,chrome_options=chrome_options) # for docker
-
+        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        # driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -1406,7 +1431,17 @@ class Parser:
                 padl = tr.find_elements_by_class_name('padl')[1]
                 # home_df updating
                 if teamName == padr.text.strip():
-                    tr.click()
+                    
+                    try:
+                        tr.click()
+                    except selenium.common.exceptions.StaleElementReferenceException:
+                        print("Unclick")
+                        continue
+                    except selenium.common.exceptions.ElementNotVisibleException:
+                        t.sleep(2)
+                        stats.click()
+                        t.sleep(2)
+                    
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     t.sleep(2)
@@ -1432,6 +1467,9 @@ class Parser:
                         t.sleep(2)
                         stats.click()
                         t.sleep(2)
+                    except selenium.common.exceptions.StaleElementReferenceException: 
+                        print("Unclick")
+                        continue
 
                     # goals detection
                     score = driver.find_elements_by_class_name('scoreboard')
@@ -1748,6 +1786,9 @@ class Parser:
                         t.sleep(2)
                         stats.click()
                         t.sleep(2)
+                    except selenium.common.exceptions.StaleElementReferenceException:
+                        print("...")
+                        continue
 
                     # goals detection
                     score = driver.find_elements_by_class_name('scoreboard')
