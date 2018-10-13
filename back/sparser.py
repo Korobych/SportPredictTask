@@ -654,6 +654,7 @@ class Parser:
                 except selenium.common.exceptions.StaleElementReferenceException: 
                     print("Unclick")
                     continue
+                
 
                 # goals detection
                 score = driver.find_elements_by_class_name('scoreboard')
@@ -915,7 +916,10 @@ class Parser:
 
             # away_df updating
             elif teamName == padl.text.strip():
-                tr.click()
+                try:
+                    tr.click()
+                except selenium.common.exceptions.StaleElementReferenceException:
+                    continue
                 window_after = driver.window_handles[1]
                 driver.switch_to.window(window_after)
                 t.sleep(2)
@@ -1760,7 +1764,10 @@ class Parser:
 
                 # away_df updating
                 elif teamName == padl.text.strip():
-                    tr.click()
+                    try:
+                        tr.click()
+                    except selenium.common.exceptions.StaleElementReferenceException:
+                        continue
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     t.sleep(3)
