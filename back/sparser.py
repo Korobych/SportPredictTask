@@ -20,7 +20,7 @@ class Parser:
             "Волейбол": "/volleyball", "Гандбол": "/handball", "Футзал": "/futsal",
             "Бейсбол": "/baseball", "Футбол": "/"}
         self.team_urls = {}
-        self.selDriver = '/app/back/chromedriver'  # for run
+        self.selDriver = '/home/prazd/selenium/chromedriver' # for run
         # '/home/prazd/selenium/chromedriver' # for prazd
         # '/app/back/chromedriver' # for docker
 
@@ -154,7 +154,6 @@ class Parser:
                  'home_team': teams_home_array,
                  'score': all_games_scores_array, 'away_team': teams_away_array, 'league': league_array}
             df = pnd.DataFrame(data=d)
-            #saving to csv
             df.to_csv("full_football_games_info.csv", header=True, index=False, encoding='utf-8')
             return d
 
@@ -215,7 +214,6 @@ class Parser:
                  'score': all_games_scores_array, 'away_team': teams_away_array, 'league': league_array}
 
             df = pnd.DataFrame(data=d)
-            # saving to csv
             df.to_csv("light_football_games_info.csv", header=True, index=False, encoding='utf-8')
             return d
         else:
@@ -228,16 +226,7 @@ class Parser:
             teams_away_scores = []
             games_statuses_array = []
             games_start_times_array = []
-            # Test ###############
-
             find = self.urls[sport][1:]
-            # if sport == "Баскетбол":
-            #     find = "basketball"
-            # elif sport == "Хоккей":
-            #     find = "hockey"
-            # elif sport == "Бейсбол":
-            #     find = "baseball"
-
             bloсks = driver.find_elements_by_class_name(find)
             
             last_block = ""
@@ -317,6 +306,9 @@ class Parser:
                             # clearing url from
                             team_url = team_url.replace('window.open(\'', '')
                             team_url = team_url.replace('\'); return false;', '')
+                            
+                            team_url += "/results" # <---------------------------------------- Обрати внимание
+
                             print(team_name, '- название команды')
                             print(team_url, '- ссылка на страницу')
                             self.team_urls.update({team_name: team_url})
@@ -357,6 +349,10 @@ class Parser:
                             team_url = team.get_attribute("onclick")
                             team_url = team_url.replace('window.open(\'', '')
                             team_url = team_url.replace('\'); return false;', '')
+
+                            team_url += "/results" # <---------------------------------------- Обрати внимание
+
+
                             print(team_name, '- название команды')
                             print(team_url, '- ссылка на страницу')
                             self.team_urls.update({team_name: team_url})
@@ -399,8 +395,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
-        # driver = webdriver.Chrome(self.selDriver)
+        # driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -447,8 +443,8 @@ class Parser:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-        # driver = webdriver.Chrome(self.selDriver)
-        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options)
+        driver = webdriver.Chrome(self.selDriver)
+        # driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -489,8 +485,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         
-        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
-        # driver = webdriver.Chrome(self.selDriver)
+        # driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         print('Начинаем собирать информацию для ', teamName)
@@ -608,606 +604,612 @@ class Parser:
         enemy_home_percent_me_blocked_kicks = []
         enemy_home_sum_of_badthings = []
 
-        block = driver.find_element_by_id('fs-summary-results')
-        tbody = block.find_element_by_tag_name('tbody')
-        trs = tbody.find_elements_by_tag_name('tr')
-        for tr in trs:
-            # TODO! kick usual games from here. (Товарищеские матчи)
 
-            padr = tr.find_element_by_class_name('padr')
-            padl = tr.find_element_by_class_name('padl')
+        soccer_bloсks = driver.find_elements_by_class_name("soccer")
+        maxCount = 8
+        realCount = 0
+        # for tr in trs:
+        for  block in soccer_bloсks[1:]:
+            try:
+                tbody = block.find_element_by_tag_name("tbody")
+            except selenium.common.exceptions.NoSuchElementException:
+                continue
+            trs = tbody.find_elements_by_tag_name("tr")
+            for tr in trs:
+                    padr = tr.find_element_by_class_name('padr')
+                    padl = tr.find_element_by_class_name('padl')
+
             # home_df updating
-            if teamName == padr.text.strip():
+                    if teamName == padr.text.strip():
+                        try:
+                            tr.click()
+                        except selenium.common.exceptions.StaleElementReferenceException: 
+                            print("Unclick")
+                            continue
 
-                try:
-                    tr.click()
-                except selenium.common.exceptions.StaleElementReferenceException: 
-                    print("Unclick")
-                    continue
+                        window_after = driver.window_handles[1]
+                        driver.switch_to.window(window_after)
+                        t.sleep(2)
+                        try:
+                            stats = driver.find_element_by_id('a-match-statistics')
+                        except selenium.common.exceptions.NoSuchElementException:
+                            print('\nНет статистики матча!\n')
+                            driver.close()
+                            driver.switch_to.window(window_before)
+                            continue
 
-                window_after = driver.window_handles[1]
-                driver.switch_to.window(window_after)
-                t.sleep(2)
-                try:
-                    stats = driver.find_element_by_id('a-match-statistics')
-                except selenium.common.exceptions.NoSuchElementException:
-                    print('\nНет статистики матча!\n')
-                    driver.close()
-                    driver.switch_to.window(window_before)
-                    continue
+                        away_team_name = driver.find_elements_by_class_name('participant-imglink')
+                        # game name append
+                        game_name = teamName + ' - ' + away_team_name[3].text
+                        print(game_name)
+                        me_home_game_name.append(game_name)
+                        enemy_away_game_name.append(game_name)
+                        
+                        ############## for unclick
+                        try:
+                            stats.click()
+                            t.sleep(2)
+                        except selenium.common.exceptions.ElementNotVisibleException:
+                            t.sleep(2)
+                            stats.click()
+                            t.sleep(2)
+                        except selenium.common.exceptions.StaleElementReferenceException: 
+                            print("Unclick")
+                            continue
+                        
 
-                away_team_name = driver.find_elements_by_class_name('participant-imglink')
-                # game name append
-                game_name = teamName + ' - ' + away_team_name[3].text
-                print(game_name)
-                me_home_game_name.append(game_name)
-                enemy_away_game_name.append(game_name)
-                
-                ############## for unclick
-                try:
-                    stats.click()
-                    t.sleep(2)
-                except selenium.common.exceptions.ElementNotVisibleException:
-                    t.sleep(2)
-                    stats.click()
-                    t.sleep(2)
-                except selenium.common.exceptions.StaleElementReferenceException: 
-                    print("Unclick")
-                    continue
-                
+                        # goals detection
+                        score = driver.find_elements_by_class_name('scoreboard')
+                        print(score[0].text, score[1].text)
+                        me_home_good_goals.append(score[0].text)
+                        me_home_missed_goals.append(score[1].text)
+                        me_home_total_goals.append(int(score[0].text) + int(score[1].text))
 
-                # goals detection
-                score = driver.find_elements_by_class_name('scoreboard')
-                print(score[0].text, score[1].text)
-                me_home_good_goals.append(score[0].text)
-                me_home_missed_goals.append(score[1].text)
-                me_home_total_goals.append(int(score[0].text) + int(score[1].text))
+                        enemy_away_good_goals.append(score[1].text)
+                        enemy_away_missed_goals.append(score[0].text)
+                        enemy_away_total_goals.append(int(score[0].text) + int(score[1].text))
+                        table = driver.find_element_by_id('tab-statistics-0-statistic')
+                        rows = table.find_elements_by_class_name('statRow')
+                        for row in rows:
+                            group = row.find_element_by_class_name('statTextGroup')
+                            param_name = group.find_element_by_css_selector('.statText.statText--titleValue')
+                            home_value = group.find_element_by_css_selector('.statText.statText--homeValue')
+                            away_value = group.find_element_by_css_selector('.statText.statText--awayValue')
 
-                enemy_away_good_goals.append(score[1].text)
-                enemy_away_missed_goals.append(score[0].text)
-                enemy_away_total_goals.append(int(score[0].text) + int(score[1].text))
-                table = driver.find_element_by_id('tab-statistics-0-statistic')
-                rows = table.find_elements_by_class_name('statRow')
-                for row in rows:
-                    group = row.find_element_by_class_name('statTextGroup')
-                    param_name = group.find_element_by_css_selector('.statText.statText--titleValue')
-                    home_value = group.find_element_by_css_selector('.statText.statText--homeValue')
-                    away_value = group.find_element_by_css_selector('.statText.statText--awayValue')
+                            if param_name.text == "Владение мячом":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_ball_control.append('0')
+                                else:
+                                    me_home_ball_control.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_ball_control.append('0')
+                                else:
+                                    enemy_away_ball_control.append(away_value.text)
+                            if param_name.text == "Удары":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_own_ball_hits.append('0')
+                                    enemy_away_me_ball_hits.append('0')
+                                else:
+                                    me_home_own_ball_hits.append(home_value.text)
+                                    enemy_away_me_ball_hits.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_home_enemy_ball_hits.append('0')
+                                    enemy_away_own_ball_hits.append('0')
+                                else:
+                                    me_home_enemy_ball_hits.append(away_value.text)
+                                    enemy_away_own_ball_hits.append(away_value.text)
+                            if param_name.text == "Удары в створ":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_own_target_ball_hits.append('0')
+                                else:
+                                    me_home_own_target_ball_hits.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_own_target_ball_hits.append('0')
+                                else:
+                                    enemy_away_own_target_ball_hits.append(away_value.text)
+                            if param_name.text == "Удары мимо":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_own_missed_ball_hits.append('0')
+                                else:
+                                    me_home_own_missed_ball_hits.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_own_missed_ball_hits.append('0')
+                                else:
+                                    enemy_away_own_missed_ball_hits.append(away_value.text)
+                            if param_name.text == "Блок-но ударов":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_away_me_blocked_hits.append('0')
+                                else:
+                                    enemy_away_me_blocked_hits.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_home_enemy_blocked_hits.append('0')
+                                else:
+                                    me_home_enemy_blocked_hits.append(away_value.text)
+                            if param_name.text == "Штрафные":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_standarts.append('0')
+                                else:
+                                    me_home_standarts.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_standarts.append('0')
+                                else:
+                                    enemy_away_standarts.append(away_value.text)
+                            if param_name.text == "Угловые":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_corner_kicks.append('0')
+                                else:
+                                    me_home_corner_kicks.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_corner_kicks.append('0')
+                                else:
+                                    enemy_away_corner_kicks.append(away_value.text)
+                            if param_name.text == "Офсайды":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_offsides.append('0')
+                                else:
+                                    me_home_offsides.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_offsides.append('0')
+                                else:
+                                    enemy_away_offsides.append(away_value.text)
+                            if param_name.text == "Сэйвы":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_saves.append('0')
+                                else:
+                                    me_home_saves.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_saves.append('0')
+                                else:
+                                    enemy_away_saves.append(away_value.text)
+                            if param_name.text == "Фолы":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_fauls.append('0')
+                                else:
+                                    me_home_fauls.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_fauls.append('0')
+                                else:
+                                    enemy_away_fauls.append(away_value.text)
+                            if param_name.text == "Желтые карточки":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_yc.append('0')
+                                else:
+                                    me_home_yc.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_yc.append('0')
+                                else:
+                                    enemy_away_yc.append(away_value.text)
+                            if param_name.text == "Красные карточки":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_home_rc.append('0')
+                                else:
+                                    me_home_rc.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_away_rc.append('0')
+                                else:
+                                    enemy_away_rc.append(away_value.text)
 
-                    if param_name.text == "Владение мячом":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_ball_control.append('0')
-                        else:
-                            me_home_ball_control.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_ball_control.append('0')
-                        else:
-                            enemy_away_ball_control.append(away_value.text)
-                    if param_name.text == "Удары":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_own_ball_hits.append('0')
-                            enemy_away_me_ball_hits.append('0')
-                        else:
-                            me_home_own_ball_hits.append(home_value.text)
-                            enemy_away_me_ball_hits.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_home_enemy_ball_hits.append('0')
-                            enemy_away_own_ball_hits.append('0')
-                        else:
-                            me_home_enemy_ball_hits.append(away_value.text)
-                            enemy_away_own_ball_hits.append(away_value.text)
-                    if param_name.text == "Удары в створ":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_own_target_ball_hits.append('0')
-                        else:
-                            me_home_own_target_ball_hits.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_own_target_ball_hits.append('0')
-                        else:
-                            enemy_away_own_target_ball_hits.append(away_value.text)
-                    if param_name.text == "Удары мимо":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_own_missed_ball_hits.append('0')
-                        else:
-                            me_home_own_missed_ball_hits.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_own_missed_ball_hits.append('0')
-                        else:
-                            enemy_away_own_missed_ball_hits.append(away_value.text)
-                    if param_name.text == "Блок-но ударов":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_away_me_blocked_hits.append('0')
-                        else:
-                            enemy_away_me_blocked_hits.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_home_enemy_blocked_hits.append('0')
-                        else:
-                            me_home_enemy_blocked_hits.append(away_value.text)
-                    if param_name.text == "Штрафные":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_standarts.append('0')
-                        else:
-                            me_home_standarts.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_standarts.append('0')
-                        else:
-                            enemy_away_standarts.append(away_value.text)
-                    if param_name.text == "Угловые":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_corner_kicks.append('0')
-                        else:
-                            me_home_corner_kicks.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_corner_kicks.append('0')
-                        else:
-                            enemy_away_corner_kicks.append(away_value.text)
-                    if param_name.text == "Офсайды":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_offsides.append('0')
-                        else:
-                            me_home_offsides.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_offsides.append('0')
-                        else:
-                            enemy_away_offsides.append(away_value.text)
-                    if param_name.text == "Сэйвы":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_saves.append('0')
-                        else:
-                            me_home_saves.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_saves.append('0')
-                        else:
-                            enemy_away_saves.append(away_value.text)
-                    if param_name.text == "Фолы":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_fauls.append('0')
-                        else:
-                            me_home_fauls.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_fauls.append('0')
-                        else:
-                            enemy_away_fauls.append(away_value.text)
-                    if param_name.text == "Желтые карточки":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_yc.append('0')
-                        else:
-                            me_home_yc.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_yc.append('0')
-                        else:
-                            enemy_away_yc.append(away_value.text)
-                    if param_name.text == "Красные карточки":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_home_rc.append('0')
-                        else:
-                            me_home_rc.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_away_rc.append('0')
-                        else:
-                            enemy_away_rc.append(away_value.text)
+                        counter = len(me_home_game_name)
 
-                counter = len(me_home_game_name)
+                        while (counter != len(me_home_ball_control) or counter != len(me_home_own_ball_hits) or counter
+                            != len(me_home_enemy_ball_hits) or counter != len(me_home_own_target_ball_hits) or counter
+                            != len(me_home_own_missed_ball_hits) or counter != len(me_home_enemy_blocked_hits) or counter
+                            != len(me_home_standarts) or counter != len(me_home_corner_kicks) or counter
+                            != len(me_home_offsides) or counter != len(me_home_saves) or counter != len(me_home_fauls) or
+                            counter != len(me_home_yc) or counter != len(me_home_rc)):
 
-                while (counter != len(me_home_ball_control) or counter != len(me_home_own_ball_hits) or counter
-                    != len(me_home_enemy_ball_hits) or counter != len(me_home_own_target_ball_hits) or counter
-                    != len(me_home_own_missed_ball_hits) or counter != len(me_home_enemy_blocked_hits) or counter
-                    != len(me_home_standarts) or counter != len(me_home_corner_kicks) or counter
-                    != len(me_home_offsides) or counter != len(me_home_saves) or counter != len(me_home_fauls) or
-                    counter != len(me_home_yc) or counter != len(me_home_rc)):
+                            if len(me_home_ball_control) != counter:
+                                me_home_ball_control.append('-')
+                            if len(me_home_own_ball_hits) != counter:
+                                me_home_own_ball_hits.append('-')
+                            if len(me_home_enemy_ball_hits) != counter:
+                                me_home_enemy_ball_hits.append('-')
+                            if len(me_home_own_target_ball_hits) != counter:
+                                me_home_own_target_ball_hits.append('-')
+                            if len(me_home_own_missed_ball_hits) != counter:
+                                me_home_own_missed_ball_hits.append('-')
+                            if len(me_home_enemy_blocked_hits) != counter:
+                                me_home_enemy_blocked_hits.append('-')
+                            if len(me_home_standarts) != counter:
+                                me_home_standarts.append('-')
+                            if len(me_home_corner_kicks) != counter:
+                                me_home_corner_kicks.append('-')
+                            if len(me_home_offsides) != counter:
+                                me_home_offsides.append('-')
+                            if len(me_home_saves) != counter:
+                                me_home_saves.append('-')
+                            if len(me_home_fauls) != counter:
+                                me_home_fauls.append('-')
+                            if len(me_home_yc) != counter:
+                                me_home_yc.append('-')
+                            if len(me_home_rc) != counter:
+                                me_home_rc.append('-')
 
-                    if len(me_home_ball_control) != counter:
-                        me_home_ball_control.append('-')
-                    if len(me_home_own_ball_hits) != counter:
-                        me_home_own_ball_hits.append('-')
-                    if len(me_home_enemy_ball_hits) != counter:
-                        me_home_enemy_ball_hits.append('-')
-                    if len(me_home_own_target_ball_hits) != counter:
-                        me_home_own_target_ball_hits.append('-')
-                    if len(me_home_own_missed_ball_hits) != counter:
-                        me_home_own_missed_ball_hits.append('-')
-                    if len(me_home_enemy_blocked_hits) != counter:
-                        me_home_enemy_blocked_hits.append('-')
-                    if len(me_home_standarts) != counter:
-                        me_home_standarts.append('-')
-                    if len(me_home_corner_kicks) != counter:
-                        me_home_corner_kicks.append('-')
-                    if len(me_home_offsides) != counter:
-                        me_home_offsides.append('-')
-                    if len(me_home_saves) != counter:
-                        me_home_saves.append('-')
-                    if len(me_home_fauls) != counter:
-                        me_home_fauls.append('-')
-                    if len(me_home_yc) != counter:
-                        me_home_yc.append('-')
-                    if len(me_home_rc) != counter:
-                        me_home_rc.append('-')
-
-                # calculated arrays
-                me_home_percent_goals_kicks.append((100 / int(me_home_own_ball_hits[counter - 1])) *
-                                                    int(me_home_good_goals[counter - 1]))
-                if me_home_own_target_ball_hits[counter - 1] != '-' and me_home_own_target_ball_hits[counter - 1] != '0':
-                    me_home_percent_target_goals_kicks.append((100 / int(me_home_own_target_ball_hits[counter - 1]))
-                                                               * int(me_home_good_goals[counter - 1]))
-                else:
-                    me_home_percent_target_goals_kicks.append('-')
-
-                if (me_home_enemy_ball_hits[counter - 1] != '-' and me_home_enemy_blocked_hits[counter - 1] != '-'
-                        and me_home_enemy_ball_hits[counter - 1] != '0'):
-                    me_home_percent_enemy_blocked_kicks.append((100 / int(me_home_enemy_ball_hits[counter - 1])) *
-                                                    int(me_home_enemy_blocked_hits[counter - 1]))
-                else:
-                    me_home_percent_enemy_blocked_kicks.append('-')
-
-                if (me_home_fauls[counter - 1] != '-' and me_home_yc[counter - 1] != '-' and
-                    me_home_rc[counter - 1] != '-' and me_home_fauls[counter - 1] != '0'):
-                    me_home_sum_of_badthings.append((100 / int(me_home_fauls[counter - 1])) *
-                        int(me_home_yc[counter - 1]) + (100 / int(me_home_fauls[counter - 1])) *
-                                                    int(me_home_rc[counter - 1]))
-                else:
-                    me_home_sum_of_badthings.append('-')
-
-                print(counter, ' домашних матча выравлены')
-
-                counter = len(enemy_away_game_name)
-                while (counter != len(enemy_away_ball_control) or counter != len(enemy_away_own_ball_hits) or
-                       counter != len(enemy_away_me_ball_hits) or counter != len(enemy_away_own_target_ball_hits)
-                       or counter != len(enemy_away_own_missed_ball_hits) or counter
-                       != len(enemy_away_me_blocked_hits) or counter != len(enemy_away_standarts) or counter
-                       != len(enemy_away_corner_kicks) or counter != len(enemy_away_offsides) or counter
-                       != len(enemy_away_saves) or counter != len(enemy_away_fauls) or counter != len(enemy_away_yc)
-                       or counter != len(enemy_away_rc)):
-
-                    if len(enemy_away_ball_control) != counter:
-                        enemy_away_ball_control.append('-')
-                    if len(enemy_away_own_ball_hits) != counter:
-                        enemy_away_own_ball_hits.append('-')
-                    if len(enemy_away_me_ball_hits) != counter:
-                        enemy_away_me_ball_hits.append('-')
-                    if len(enemy_away_own_target_ball_hits) != counter:
-                        enemy_away_own_target_ball_hits.append('-')
-                    if len(enemy_away_own_missed_ball_hits) != counter:
-                        enemy_away_own_missed_ball_hits.append('-')
-                    if len(enemy_away_me_blocked_hits) != counter:
-                        enemy_away_me_blocked_hits.append('-')
-                    if len(enemy_away_standarts) != counter:
-                        enemy_away_standarts.append('-')
-                    if len(enemy_away_corner_kicks) != counter:
-                        enemy_away_corner_kicks.append('-')
-                    if len(enemy_away_offsides) != counter:
-                        enemy_away_offsides.append('-')
-                    if len(enemy_away_saves) != counter:
-                        enemy_away_saves.append('-')
-                    if len(enemy_away_fauls) != counter:
-                        enemy_away_fauls.append('-')
-                    if len(enemy_away_yc) != counter:
-                        enemy_away_yc.append('-')
-                    if len(enemy_away_rc) != counter:
-                        enemy_away_rc.append('-')
-
-                enemy_away_percent_goals_kicks.append((100 / int(enemy_away_own_ball_hits[counter - 1])) *
-                                                   int(enemy_away_good_goals[counter - 1]))
-                if (enemy_away_own_target_ball_hits[counter - 1] != '-' and
-                        enemy_away_own_target_ball_hits[counter - 1] != '0'):
-                    enemy_away_percent_target_goals_kicks.append((100 / int(enemy_away_own_target_ball_hits[counter - 1]))
-                                                              * int(enemy_away_good_goals[counter - 1]))
-                else:
-                    enemy_away_percent_target_goals_kicks.append('-')
-
-                if (enemy_away_me_ball_hits[counter - 1] != '-' and enemy_away_me_blocked_hits[counter - 1] != '-'
-                        and enemy_away_me_ball_hits[counter - 1] != '0'):
-                    enemy_away_percent_me_blocked_kicks.append((100 / int(enemy_away_me_ball_hits[counter - 1])) *
-                                                               int(enemy_away_me_blocked_hits[counter - 1]))
-                else:
-                    enemy_away_percent_me_blocked_kicks.append('-')
-
-                if (enemy_away_fauls[counter - 1] != '-' and enemy_away_yc[counter - 1] != '-' and
-                        enemy_away_rc[counter - 1] != '-' and enemy_away_fauls[counter - 1] != '0'):
-                    enemy_away_sum_of_badthings.append((100 / int(enemy_away_fauls[counter - 1])) *
-                                                    int(enemy_away_yc[counter - 1]) + (
-                                                                100 / int(enemy_away_fauls[counter - 1])) *
-                                                    int(enemy_away_rc[counter - 1]))
-                else:
-                    enemy_away_sum_of_badthings.append('-')
-                print(counter, ' мачта противника в гостях выравлены')
-
-                driver.close()
-                driver.switch_to.window(window_before)
-
-            # away_df updating
-            elif teamName == padl.text.strip():
-                try:
-                    tr.click()
-                except selenium.common.exceptions.StaleElementReferenceException:
-                    continue
-                window_after = driver.window_handles[1]
-                driver.switch_to.window(window_after)
-                t.sleep(2)
-                try:
-                    stats = driver.find_element_by_id('a-match-statistics')
-                except selenium.common.exceptions.NoSuchElementException:
-                    print('нет статистики матча')
-                    driver.close()
-                    driver.switch_to.window(window_before)
-                    continue
-
-                home_team_name = driver.find_elements_by_class_name('participant-imglink')
-                # game name append
-                game_name = home_team_name[1].text + ' - ' + teamName
-                print(game_name)
-                enemy_home_game_name.append(game_name)
-                me_away_game_name.append(game_name)
-
-                try:
-                    stats.click()
-                    t.sleep(2)
-                except selenium.common.exceptions.StaleElementReferenceException:
-                    print("...")
-                    continue
-                except selenium.common.exceptions.ElementNotVisibleException:
-                    t.sleep(2)
-                    stats.click()
-                    t.sleep(2)
-
-                # goals detection
-                score = driver.find_elements_by_class_name('scoreboard')
-                print(score[0].text, score[1].text)
-                enemy_home_good_goals.append(score[0].text)
-                enemy_home_missed_goals.append(score[1].text)
-                enemy_home_total_goals.append(int(score[0].text) + int(score[1].text))
-
-                me_away_good_goals.append(score[1].text)
-                me_away_missed_goals.append(score[0].text)
-                me_away_total_goals.append(int(score[0].text) + int(score[1].text))
-                table = driver.find_element_by_id('tab-statistics-0-statistic')
-                rows = table.find_elements_by_class_name('statRow')
-                for row in rows:
-                    group = row.find_element_by_class_name('statTextGroup')
-                    param_name = group.find_element_by_css_selector('.statText.statText--titleValue')
-                    home_value = group.find_element_by_css_selector('.statText.statText--homeValue')
-                    away_value = group.find_element_by_css_selector('.statText.statText--awayValue')
-
-                    if param_name.text == "Владение мячом":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_ball_control.append('0')
+                        # calculated arrays
+                        me_home_percent_goals_kicks.append((100 / int(me_home_own_ball_hits[counter - 1])) *
+                                                            int(me_home_good_goals[counter - 1]))
+                        if me_home_own_target_ball_hits[counter - 1] != '-' and me_home_own_target_ball_hits[counter - 1] != '0':
+                            me_home_percent_target_goals_kicks.append((100 / int(me_home_own_target_ball_hits[counter - 1]))
+                                                                    * int(me_home_good_goals[counter - 1]))
                         else:
-                            enemy_home_ball_control.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_ball_control.append('0')
-                        else:
-                            me_away_ball_control.append(away_value.text)
-                    if param_name.text == "Удары":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_own_ball_hits.append('0')
-                            me_away_enemy_ball_hits.append('0')
-                        else:
-                            enemy_home_own_ball_hits.append(home_value.text)
-                            me_away_enemy_ball_hits.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_home_me_ball_hits.append('0')
-                            me_away_own_ball_hits.append('0')
-                        else:
-                            enemy_home_me_ball_hits.append(away_value.text)
-                            me_away_own_ball_hits.append(away_value.text)
-                    if param_name.text == "Удары в створ":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_own_target_ball_hits.append('0')
-                        else:
-                            enemy_home_own_target_ball_hits.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_own_target_ball_hits.append('0')
-                        else:
-                            me_away_own_target_ball_hits.append(away_value.text)
-                    if param_name.text == "Удары мимо":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_own_missed_ball_hits.append('0')
-                        else:
-                            enemy_home_own_missed_ball_hits.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_own_missed_ball_hits.append('0')
-                        else:
-                            me_away_own_missed_ball_hits.append(away_value.text)
-                    if param_name.text == "Блок-но ударов":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            me_away_enemy_blocked_hits.append('0')
-                        else:
-                            me_away_enemy_blocked_hits.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            enemy_home_me_blocked_hits.append('0')
-                        else:
-                            enemy_home_me_blocked_hits.append(away_value.text)
-                    if param_name.text == "Штрафные":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_standarts.append('0')
-                        else:
-                            enemy_home_standarts.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_standarts.append('0')
-                        else:
-                            me_away_standarts.append(away_value.text)
-                    if param_name.text == "Угловые":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_corner_kicks.append('0')
-                        else:
-                            enemy_home_corner_kicks.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_corner_kicks.append('0')
-                        else:
-                            me_away_corner_kicks.append(away_value.text)
-                    if param_name.text == "Офсайды":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_offsides.append('0')
-                        else:
-                            enemy_home_offsides.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_offsides.append('0')
-                        else:
-                            me_away_offsides.append(away_value.text)
-                    if param_name.text == "Сэйвы":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_saves.append('0')
-                        else:
-                            enemy_home_saves.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_saves.append('0')
-                        else:
-                            me_away_saves.append(away_value.text)
-                    if param_name.text == "Фолы":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_fauls.append('0')
-                        else:
-                            enemy_home_fauls.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_fauls.append('0')
-                        else:
-                            me_away_fauls.append(away_value.text)
-                    if param_name.text == "Желтые карточки":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_yc.append('0')
-                        else:
-                            enemy_home_yc.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_yc.append('0')
-                        else:
-                            me_away_yc.append(away_value.text)
-                    if param_name.text == "Красные карточки":
-                        if home_value.text.startswith('-') and home_value.text[1:].isdigit():
-                            enemy_home_rc.append('0')
-                        else:
-                            enemy_home_rc.append(home_value.text)
-                        if away_value.text.startswith('-') and away_value.text[1:].isdigit():
-                            me_away_rc.append('0')
-                        else:
-                            me_away_rc.append(away_value.text)
+                            me_home_percent_target_goals_kicks.append('-')
 
-                counter = len(me_away_game_name)
+                        if (me_home_enemy_ball_hits[counter - 1] != '-' and me_home_enemy_blocked_hits[counter - 1] != '-'
+                                and me_home_enemy_ball_hits[counter - 1] != '0'):
+                            me_home_percent_enemy_blocked_kicks.append((100 / int(me_home_enemy_ball_hits[counter - 1])) *
+                                                            int(me_home_enemy_blocked_hits[counter - 1]))
+                        else:
+                            me_home_percent_enemy_blocked_kicks.append('-')
 
-                while (counter != len(me_away_ball_control) or counter != len(me_away_own_ball_hits) or counter
-                    != len(me_away_enemy_ball_hits) or counter != len(me_away_own_target_ball_hits) or counter
-                    != len(me_away_own_missed_ball_hits) or counter != len(me_away_enemy_blocked_hits) or counter
-                    != len(me_away_standarts) or counter != len(me_away_corner_kicks) or counter
-                    != len(me_away_offsides) or counter != len(me_away_saves) or counter != len(me_away_fauls) or
-                    counter != len(me_away_yc) or counter != len(me_away_rc)):
+                        if (me_home_fauls[counter - 1] != '-' and me_home_yc[counter - 1] != '-' and
+                            me_home_rc[counter - 1] != '-' and me_home_fauls[counter - 1] != '0'):
+                            me_home_sum_of_badthings.append((100 / int(me_home_fauls[counter - 1])) *
+                                int(me_home_yc[counter - 1]) + (100 / int(me_home_fauls[counter - 1])) *
+                                                            int(me_home_rc[counter - 1]))
+                        else:
+                            me_home_sum_of_badthings.append('-')
 
-                    if len(me_away_ball_control) != counter:
-                        me_away_ball_control.append('-')
-                    if len(me_away_own_ball_hits) != counter:
-                        me_away_own_ball_hits.append('-')
-                    if len(me_away_enemy_ball_hits) != counter:
-                        me_away_enemy_ball_hits.append('-')
-                    if len(me_away_own_target_ball_hits) != counter:
-                        me_away_own_target_ball_hits.append('-')
-                    if len(me_away_own_missed_ball_hits) != counter:
-                        me_away_own_missed_ball_hits.append('-')
-                    if len(me_away_enemy_blocked_hits) != counter:
-                        me_away_enemy_blocked_hits.append('-')
-                    if len(me_away_standarts) != counter:
-                        me_away_standarts.append('-')
-                    if len(me_away_corner_kicks) != counter:
-                        me_away_corner_kicks.append('-')
-                    if len(me_away_offsides) != counter:
-                        me_away_offsides.append('-')
-                    if len(me_away_saves) != counter:
-                        me_away_saves.append('-')
-                    if len(me_away_fauls) != counter:
-                        me_away_fauls.append('-')
-                    if len(me_away_yc) != counter:
-                        me_away_yc.append('-')
-                    if len(me_away_rc) != counter:
-                        me_away_rc.append('-')
+                        print(counter, ' домашних матча выравлены')
 
-                # calculated arrays
-                me_away_percent_goals_kicks.append((100 / int(me_away_own_ball_hits[counter - 1])) *
-                                                    int(me_away_good_goals[counter - 1]))
-                if (me_away_own_target_ball_hits[counter - 1] != '-' and
-                        me_away_own_target_ball_hits[counter - 1] != '0'):
-                    me_away_percent_target_goals_kicks.append((100 / int(me_away_own_target_ball_hits[counter - 1]))
-                                                               * int(me_away_good_goals[counter - 1]))
-                else:
-                    me_away_percent_target_goals_kicks.append('-')
+                        counter = len(enemy_away_game_name)
+                        while (counter != len(enemy_away_ball_control) or counter != len(enemy_away_own_ball_hits) or
+                            counter != len(enemy_away_me_ball_hits) or counter != len(enemy_away_own_target_ball_hits)
+                            or counter != len(enemy_away_own_missed_ball_hits) or counter
+                            != len(enemy_away_me_blocked_hits) or counter != len(enemy_away_standarts) or counter
+                            != len(enemy_away_corner_kicks) or counter != len(enemy_away_offsides) or counter
+                            != len(enemy_away_saves) or counter != len(enemy_away_fauls) or counter != len(enemy_away_yc)
+                            or counter != len(enemy_away_rc)):
 
-                if (me_away_enemy_ball_hits[counter - 1 ] != '-' and  me_away_enemy_blocked_hits[counter - 1] != '-'
-                        and me_away_enemy_ball_hits[counter - 1 ] != '0'):
-                    me_away_percent_enemy_blocked_kicks.append((100 / int(me_away_enemy_ball_hits[counter - 1])) *
-                                                    int(me_away_enemy_blocked_hits[counter - 1]))
-                else:
-                    me_away_percent_enemy_blocked_kicks.append('-')
+                            if len(enemy_away_ball_control) != counter:
+                                enemy_away_ball_control.append('-')
+                            if len(enemy_away_own_ball_hits) != counter:
+                                enemy_away_own_ball_hits.append('-')
+                            if len(enemy_away_me_ball_hits) != counter:
+                                enemy_away_me_ball_hits.append('-')
+                            if len(enemy_away_own_target_ball_hits) != counter:
+                                enemy_away_own_target_ball_hits.append('-')
+                            if len(enemy_away_own_missed_ball_hits) != counter:
+                                enemy_away_own_missed_ball_hits.append('-')
+                            if len(enemy_away_me_blocked_hits) != counter:
+                                enemy_away_me_blocked_hits.append('-')
+                            if len(enemy_away_standarts) != counter:
+                                enemy_away_standarts.append('-')
+                            if len(enemy_away_corner_kicks) != counter:
+                                enemy_away_corner_kicks.append('-')
+                            if len(enemy_away_offsides) != counter:
+                                enemy_away_offsides.append('-')
+                            if len(enemy_away_saves) != counter:
+                                enemy_away_saves.append('-')
+                            if len(enemy_away_fauls) != counter:
+                                enemy_away_fauls.append('-')
+                            if len(enemy_away_yc) != counter:
+                                enemy_away_yc.append('-')
+                            if len(enemy_away_rc) != counter:
+                                enemy_away_rc.append('-')
 
-                if (me_away_fauls[counter - 1] != '-' and me_away_yc[counter - 1] != '-' and
-                    me_away_rc[counter - 1] != '-' and me_away_fauls[counter - 1] != '0'):
-                    me_away_sum_of_badthings.append((100 / int(me_away_fauls[counter - 1])) *
-                        int(me_away_yc[counter - 1]) + (100 / int(me_away_fauls[counter - 1])) *
-                                                    int(me_away_rc[counter - 1]))
-                else:
-                    me_away_sum_of_badthings.append('-')
+                        enemy_away_percent_goals_kicks.append((100 / int(enemy_away_own_ball_hits[counter - 1])) *
+                                                        int(enemy_away_good_goals[counter - 1]))
+                        if (enemy_away_own_target_ball_hits[counter - 1] != '-' and
+                                enemy_away_own_target_ball_hits[counter - 1] != '0'):
+                            enemy_away_percent_target_goals_kicks.append((100 / int(enemy_away_own_target_ball_hits[counter - 1]))
+                                                                    * int(enemy_away_good_goals[counter - 1]))
+                        else:
+                            enemy_away_percent_target_goals_kicks.append('-')
 
-                print(counter, ' матча в гостях выравлены')
+                        if (enemy_away_me_ball_hits[counter - 1] != '-' and enemy_away_me_blocked_hits[counter - 1] != '-'
+                                and enemy_away_me_ball_hits[counter - 1] != '0'):
+                            enemy_away_percent_me_blocked_kicks.append((100 / int(enemy_away_me_ball_hits[counter - 1])) *
+                                                                    int(enemy_away_me_blocked_hits[counter - 1]))
+                        else:
+                            enemy_away_percent_me_blocked_kicks.append('-')
 
-                counter = len(enemy_home_game_name)
-                while (counter != len(enemy_home_ball_control) or counter != len(enemy_home_own_ball_hits) or
-                       counter != len(enemy_home_me_ball_hits) or counter != len(enemy_home_own_target_ball_hits)
-                       or counter != len(enemy_home_own_missed_ball_hits) or counter
-                       != len(enemy_home_me_blocked_hits) or counter != len(enemy_home_standarts) or counter
-                       != len(enemy_home_corner_kicks) or counter != len(enemy_home_offsides) or counter
-                       != len(enemy_home_saves) or counter != len(enemy_home_fauls) or counter != len(enemy_home_yc)
-                       or counter != len(enemy_home_rc)):
+                        if (enemy_away_fauls[counter - 1] != '-' and enemy_away_yc[counter - 1] != '-' and
+                                enemy_away_rc[counter - 1] != '-' and enemy_away_fauls[counter - 1] != '0'):
+                            enemy_away_sum_of_badthings.append((100 / int(enemy_away_fauls[counter - 1])) *
+                                                            int(enemy_away_yc[counter - 1]) + (
+                                                                        100 / int(enemy_away_fauls[counter - 1])) *
+                                                            int(enemy_away_rc[counter - 1]))
+                        else:
+                            enemy_away_sum_of_badthings.append('-')
+                        print(counter, ' мачта противника в гостях выравлены')
 
-                    if len(enemy_home_ball_control) != counter:
-                        enemy_home_ball_control.append('-')
-                    if len(enemy_home_own_ball_hits) != counter:
-                        enemy_home_own_ball_hits.append('-')
-                    if len(enemy_home_me_ball_hits) != counter:
-                        enemy_home_me_ball_hits.append('-')
-                    if len(enemy_home_own_target_ball_hits) != counter:
-                        enemy_home_own_target_ball_hits.append('-')
-                    if len(enemy_home_own_missed_ball_hits) != counter:
-                        enemy_home_own_missed_ball_hits.append('-')
-                    if len(enemy_home_me_blocked_hits) != counter:
-                        enemy_home_me_blocked_hits.append('-')
-                    if len(enemy_home_standarts) != counter:
-                        enemy_home_standarts.append('-')
-                    if len(enemy_home_corner_kicks) != counter:
-                        enemy_home_corner_kicks.append('-')
-                    if len(enemy_home_offsides) != counter:
-                        enemy_home_offsides.append('-')
-                    if len(enemy_home_saves) != counter:
-                        enemy_home_saves.append('-')
-                    if len(enemy_home_fauls) != counter:
-                        enemy_home_fauls.append('-')
-                    if len(enemy_home_yc) != counter:
-                        enemy_home_yc.append('-')
-                    if len(enemy_home_rc) != counter:
-                        enemy_home_rc.append('-')
+                        driver.close()
+                        driver.switch_to.window(window_before)
 
-                enemy_home_percent_goals_kicks.append((100 / int(enemy_home_own_ball_hits[counter - 1])) *
-                                                      int(enemy_home_good_goals[counter - 1]))
-                if (enemy_home_own_target_ball_hits[counter - 1] != '-' and
-                        enemy_home_own_target_ball_hits[counter - 1] != '0'):
-                    enemy_home_percent_target_goals_kicks.append(
-                        (100 / int(enemy_home_own_target_ball_hits[counter - 1]))
-                        * int(enemy_home_good_goals[counter - 1]))
-                else:
-                    enemy_home_percent_target_goals_kicks.append('-')
+                    # away_df updating
+                    elif teamName == padl.text.strip():
+                        try:
+                            tr.click()
+                        except selenium.common.exceptions.StaleElementReferenceException:
+                            continue
+                        window_after = driver.window_handles[1]
+                        driver.switch_to.window(window_after)
+                        t.sleep(2)
+                        try:
+                            stats = driver.find_element_by_id('a-match-statistics')
+                        except selenium.common.exceptions.NoSuchElementException:
+                            print('нет статистики матча')
+                            driver.close()
+                            driver.switch_to.window(window_before)
+                            continue
 
-                if (enemy_home_me_ball_hits[counter - 1] != '-' and enemy_home_me_blocked_hits[counter - 1] != '-'
-                        and enemy_home_me_ball_hits[counter - 1] != '0'):
-                    enemy_home_percent_me_blocked_kicks.append((100 / int(enemy_home_me_ball_hits[counter - 1])) *
-                                                               int(enemy_home_me_blocked_hits[counter - 1]))
-                else:
-                    enemy_home_percent_me_blocked_kicks.append('-')
+                        home_team_name = driver.find_elements_by_class_name('participant-imglink')
+                        # game name append
+                        game_name = home_team_name[1].text + ' - ' + teamName
+                        print(game_name)
+                        enemy_home_game_name.append(game_name)
+                        me_away_game_name.append(game_name)
 
-                if (enemy_home_fauls[counter - 1] != '-' and enemy_home_yc[counter - 1] != '-' and
-                        enemy_home_rc[counter - 1] != '-' and enemy_home_fauls[counter - 1] != '0'):
-                    enemy_home_sum_of_badthings.append((100 / int(enemy_home_fauls[counter - 1])) *
-                                                       int(enemy_home_yc[counter - 1]) + (
-                                                               100 / int(enemy_home_fauls[counter - 1])) *
-                                                       int(enemy_home_rc[counter - 1]))
-                else:
-                    enemy_home_sum_of_badthings.append('-')
-                print(counter, ' мачта противника дома выравлены')
+                        try:
+                            stats.click()
+                            t.sleep(2)
+                        except selenium.common.exceptions.StaleElementReferenceException:
+                            print("...")
+                            continue
+                        except selenium.common.exceptions.ElementNotVisibleException:
+                            t.sleep(2)
+                            stats.click()
+                            t.sleep(2)
 
-                driver.close()
-                driver.switch_to.window(window_before)
+                        # goals detection
+                        score = driver.find_elements_by_class_name('scoreboard')
+                        print(score[0].text, score[1].text)
+                        enemy_home_good_goals.append(score[0].text)
+                        enemy_home_missed_goals.append(score[1].text)
+                        enemy_home_total_goals.append(int(score[0].text) + int(score[1].text))
+
+                        me_away_good_goals.append(score[1].text)
+                        me_away_missed_goals.append(score[0].text)
+                        me_away_total_goals.append(int(score[0].text) + int(score[1].text))
+                        table = driver.find_element_by_id('tab-statistics-0-statistic')
+                        rows = table.find_elements_by_class_name('statRow')
+                        for row in rows:
+                            group = row.find_element_by_class_name('statTextGroup')
+                            param_name = group.find_element_by_css_selector('.statText.statText--titleValue')
+                            home_value = group.find_element_by_css_selector('.statText.statText--homeValue')
+                            away_value = group.find_element_by_css_selector('.statText.statText--awayValue')
+
+                            if param_name.text == "Владение мячом":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_ball_control.append('0')
+                                else:
+                                    enemy_home_ball_control.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_ball_control.append('0')
+                                else:
+                                    me_away_ball_control.append(away_value.text)
+                            if param_name.text == "Удары":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_own_ball_hits.append('0')
+                                    me_away_enemy_ball_hits.append('0')
+                                else:
+                                    enemy_home_own_ball_hits.append(home_value.text)
+                                    me_away_enemy_ball_hits.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_home_me_ball_hits.append('0')
+                                    me_away_own_ball_hits.append('0')
+                                else:
+                                    enemy_home_me_ball_hits.append(away_value.text)
+                                    me_away_own_ball_hits.append(away_value.text)
+                            if param_name.text == "Удары в створ":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_own_target_ball_hits.append('0')
+                                else:
+                                    enemy_home_own_target_ball_hits.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_own_target_ball_hits.append('0')
+                                else:
+                                    me_away_own_target_ball_hits.append(away_value.text)
+                            if param_name.text == "Удары мимо":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_own_missed_ball_hits.append('0')
+                                else:
+                                    enemy_home_own_missed_ball_hits.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_own_missed_ball_hits.append('0')
+                                else:
+                                    me_away_own_missed_ball_hits.append(away_value.text)
+                            if param_name.text == "Блок-но ударов":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    me_away_enemy_blocked_hits.append('0')
+                                else:
+                                    me_away_enemy_blocked_hits.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    enemy_home_me_blocked_hits.append('0')
+                                else:
+                                    enemy_home_me_blocked_hits.append(away_value.text)
+                            if param_name.text == "Штрафные":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_standarts.append('0')
+                                else:
+                                    enemy_home_standarts.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_standarts.append('0')
+                                else:
+                                    me_away_standarts.append(away_value.text)
+                            if param_name.text == "Угловые":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_corner_kicks.append('0')
+                                else:
+                                    enemy_home_corner_kicks.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_corner_kicks.append('0')
+                                else:
+                                    me_away_corner_kicks.append(away_value.text)
+                            if param_name.text == "Офсайды":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_offsides.append('0')
+                                else:
+                                    enemy_home_offsides.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_offsides.append('0')
+                                else:
+                                    me_away_offsides.append(away_value.text)
+                            if param_name.text == "Сэйвы":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_saves.append('0')
+                                else:
+                                    enemy_home_saves.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_saves.append('0')
+                                else:
+                                    me_away_saves.append(away_value.text)
+                            if param_name.text == "Фолы":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_fauls.append('0')
+                                else:
+                                    enemy_home_fauls.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_fauls.append('0')
+                                else:
+                                    me_away_fauls.append(away_value.text)
+                            if param_name.text == "Желтые карточки":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_yc.append('0')
+                                else:
+                                    enemy_home_yc.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_yc.append('0')
+                                else:
+                                    me_away_yc.append(away_value.text)
+                            if param_name.text == "Красные карточки":
+                                if home_value.text.startswith('-') and home_value.text[1:].isdigit():
+                                    enemy_home_rc.append('0')
+                                else:
+                                    enemy_home_rc.append(home_value.text)
+                                if away_value.text.startswith('-') and away_value.text[1:].isdigit():
+                                    me_away_rc.append('0')
+                                else:
+                                    me_away_rc.append(away_value.text)
+
+                        counter = len(me_away_game_name)
+
+                        while (counter != len(me_away_ball_control) or counter != len(me_away_own_ball_hits) or counter
+                            != len(me_away_enemy_ball_hits) or counter != len(me_away_own_target_ball_hits) or counter
+                            != len(me_away_own_missed_ball_hits) or counter != len(me_away_enemy_blocked_hits) or counter
+                            != len(me_away_standarts) or counter != len(me_away_corner_kicks) or counter
+                            != len(me_away_offsides) or counter != len(me_away_saves) or counter != len(me_away_fauls) or
+                            counter != len(me_away_yc) or counter != len(me_away_rc)):
+
+                            if len(me_away_ball_control) != counter:
+                                me_away_ball_control.append('-')
+                            if len(me_away_own_ball_hits) != counter:
+                                me_away_own_ball_hits.append('-')
+                            if len(me_away_enemy_ball_hits) != counter:
+                                me_away_enemy_ball_hits.append('-')
+                            if len(me_away_own_target_ball_hits) != counter:
+                                me_away_own_target_ball_hits.append('-')
+                            if len(me_away_own_missed_ball_hits) != counter:
+                                me_away_own_missed_ball_hits.append('-')
+                            if len(me_away_enemy_blocked_hits) != counter:
+                                me_away_enemy_blocked_hits.append('-')
+                            if len(me_away_standarts) != counter:
+                                me_away_standarts.append('-')
+                            if len(me_away_corner_kicks) != counter:
+                                me_away_corner_kicks.append('-')
+                            if len(me_away_offsides) != counter:
+                                me_away_offsides.append('-')
+                            if len(me_away_saves) != counter:
+                                me_away_saves.append('-')
+                            if len(me_away_fauls) != counter:
+                                me_away_fauls.append('-')
+                            if len(me_away_yc) != counter:
+                                me_away_yc.append('-')
+                            if len(me_away_rc) != counter:
+                                me_away_rc.append('-')
+
+                        # calculated arrays
+                        me_away_percent_goals_kicks.append((100 / int(me_away_own_ball_hits[counter - 1])) *
+                                                            int(me_away_good_goals[counter - 1]))
+                        if (me_away_own_target_ball_hits[counter - 1] != '-' and
+                                me_away_own_target_ball_hits[counter - 1] != '0'):
+                            me_away_percent_target_goals_kicks.append((100 / int(me_away_own_target_ball_hits[counter - 1]))
+                                                                    * int(me_away_good_goals[counter - 1]))
+                        else:
+                            me_away_percent_target_goals_kicks.append('-')
+
+                        if (me_away_enemy_ball_hits[counter - 1 ] != '-' and  me_away_enemy_blocked_hits[counter - 1] != '-'
+                                and me_away_enemy_ball_hits[counter - 1 ] != '0'):
+                            me_away_percent_enemy_blocked_kicks.append((100 / int(me_away_enemy_ball_hits[counter - 1])) *
+                                                            int(me_away_enemy_blocked_hits[counter - 1]))
+                        else:
+                            me_away_percent_enemy_blocked_kicks.append('-')
+
+                        if (me_away_fauls[counter - 1] != '-' and me_away_yc[counter - 1] != '-' and
+                            me_away_rc[counter - 1] != '-' and me_away_fauls[counter - 1] != '0'):
+                            me_away_sum_of_badthings.append((100 / int(me_away_fauls[counter - 1])) *
+                                int(me_away_yc[counter - 1]) + (100 / int(me_away_fauls[counter - 1])) *
+                                                            int(me_away_rc[counter - 1]))
+                        else:
+                            me_away_sum_of_badthings.append('-')
+
+                        print(counter, ' матча в гостях выравлены')
+
+                        counter = len(enemy_home_game_name)
+                        while (counter != len(enemy_home_ball_control) or counter != len(enemy_home_own_ball_hits) or
+                            counter != len(enemy_home_me_ball_hits) or counter != len(enemy_home_own_target_ball_hits)
+                            or counter != len(enemy_home_own_missed_ball_hits) or counter
+                            != len(enemy_home_me_blocked_hits) or counter != len(enemy_home_standarts) or counter
+                            != len(enemy_home_corner_kicks) or counter != len(enemy_home_offsides) or counter
+                            != len(enemy_home_saves) or counter != len(enemy_home_fauls) or counter != len(enemy_home_yc)
+                            or counter != len(enemy_home_rc)):
+
+                            if len(enemy_home_ball_control) != counter:
+                                enemy_home_ball_control.append('-')
+                            if len(enemy_home_own_ball_hits) != counter:
+                                enemy_home_own_ball_hits.append('-')
+                            if len(enemy_home_me_ball_hits) != counter:
+                                enemy_home_me_ball_hits.append('-')
+                            if len(enemy_home_own_target_ball_hits) != counter:
+                                enemy_home_own_target_ball_hits.append('-')
+                            if len(enemy_home_own_missed_ball_hits) != counter:
+                                enemy_home_own_missed_ball_hits.append('-')
+                            if len(enemy_home_me_blocked_hits) != counter:
+                                enemy_home_me_blocked_hits.append('-')
+                            if len(enemy_home_standarts) != counter:
+                                enemy_home_standarts.append('-')
+                            if len(enemy_home_corner_kicks) != counter:
+                                enemy_home_corner_kicks.append('-')
+                            if len(enemy_home_offsides) != counter:
+                                enemy_home_offsides.append('-')
+                            if len(enemy_home_saves) != counter:
+                                enemy_home_saves.append('-')
+                            if len(enemy_home_fauls) != counter:
+                                enemy_home_fauls.append('-')
+                            if len(enemy_home_yc) != counter:
+                                enemy_home_yc.append('-')
+                            if len(enemy_home_rc) != counter:
+                                enemy_home_rc.append('-')
+
+                        enemy_home_percent_goals_kicks.append((100 / int(enemy_home_own_ball_hits[counter - 1])) *
+                                                            int(enemy_home_good_goals[counter - 1]))
+                        if (enemy_home_own_target_ball_hits[counter - 1] != '-' and
+                                enemy_home_own_target_ball_hits[counter - 1] != '0'):
+                            enemy_home_percent_target_goals_kicks.append(
+                                (100 / int(enemy_home_own_target_ball_hits[counter - 1]))
+                                * int(enemy_home_good_goals[counter - 1]))
+                        else:
+                            enemy_home_percent_target_goals_kicks.append('-')
+
+                        if (enemy_home_me_ball_hits[counter - 1] != '-' and enemy_home_me_blocked_hits[counter - 1] != '-'
+                                and enemy_home_me_ball_hits[counter - 1] != '0'):
+                            enemy_home_percent_me_blocked_kicks.append((100 / int(enemy_home_me_ball_hits[counter - 1])) *
+                                                                    int(enemy_home_me_blocked_hits[counter - 1]))
+                        else:
+                            enemy_home_percent_me_blocked_kicks.append('-')
+
+                        if (enemy_home_fauls[counter - 1] != '-' and enemy_home_yc[counter - 1] != '-' and
+                                enemy_home_rc[counter - 1] != '-' and enemy_home_fauls[counter - 1] != '0'):
+                            enemy_home_sum_of_badthings.append((100 / int(enemy_home_fauls[counter - 1])) *
+                                                            int(enemy_home_yc[counter - 1]) + (
+                                                                    100 / int(enemy_home_fauls[counter - 1])) *
+                                                            int(enemy_home_rc[counter - 1]))
+                        else:
+                            enemy_home_sum_of_badthings.append('-')
+                        print(counter, ' мачта противника дома выравлены')
+
+                        driver.close()
+                        driver.switch_to.window(window_before)
 
         me_home_d = {'match_name': me_home_game_name, 'goals': me_home_good_goals, 'missed': me_home_missed_goals,
                      'total': me_home_total_goals, 'ball_control': me_home_ball_control,
@@ -1292,8 +1294,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
-        # driver = webdriver.Chrome(self.selDriver)
+        # driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -1424,13 +1426,20 @@ class Parser:
         enemy_home_percent_full_realization = []
         enemy_home_percent_won_throw_ins = []
 
-        block = driver.find_element_by_id('fs-summary-results')
-        tbodys = block.find_elements_by_tag_name('tbody')
-        for tbody in tbodys:
-            trs = tbody.find_elements_by_tag_name('tr')
+        # block = driver.find_element_by_id('fs-summary-results')
+        # tbodys = block.find_elements_by_tag_name('tbody')
+        # for tbody in tbodys:
+        #     trs = tbody.find_elements_by_tag_name('tr')
+        # find = self.urls[sport][1:]
+        sport_bloсks = driver.find_elements_by_class_name('hockey')
+            
+        print(sport_bloсks)
+        for block in sport_bloсks[1:]:
+            tbody = block.find_element_by_tag_name("tbody")
+            trs = tbody.find_elements_by_tag_name("tr")
+
             for tr in trs:
                 # TODO! kick usual games from here. (Товарищеские матчи)
-
                 padr = tr.find_elements_by_class_name('padl')[0]
                 padl = tr.find_elements_by_class_name('padl')[1]
                 # home_df updating
@@ -2182,6 +2191,8 @@ class Parser:
                  t2.start()
                  t1.join()
                  t2.join()
+                #  self.searchFootballInfo(team_name1,url1,writer)
+                #  self.searchFootballInfo(team_name2,url2,writer)
                  return "ok"
             finally:
                 writer.close()
