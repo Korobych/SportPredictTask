@@ -20,6 +20,12 @@ class Parser:
             "Волейбол": "/volleyball", "Гандбол": "/handball", "Футзал": "/futsal",
             "Бейсбол": "/baseball", "Футбол": "/"}
         self.team_urls = {}
+
+        self.homeTeamDF = None
+        self.awayTeamDF = None
+        self.homeTeamOppDF = None
+        self.awayTeamOppDF = None
+
         self.selDriver = '/home/prazd/selenium/chromedriver' # for run
         # '/home/prazd/selenium/chromedriver' # for prazd
         # '/app/back/chromedriver' # for docker
@@ -395,8 +401,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        # driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
-        driver = webdriver.Chrome(self.selDriver)
+        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        # driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -443,8 +449,8 @@ class Parser:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-        driver = webdriver.Chrome(self.selDriver)
-        # driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options)
+        # driver = webdriver.Chrome(self.selDriver)
+        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -485,8 +491,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         
-        # driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
-        driver = webdriver.Chrome(self.selDriver)
+        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        # driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
         print('Начинаем собирать информацию для ', teamName)
@@ -1294,8 +1300,8 @@ class Parser:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
 
-        # driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
-        driver = webdriver.Chrome(self.selDriver)
+        driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options) 
+        # driver = webdriver.Chrome(self.selDriver)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
         # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
 
@@ -2110,7 +2116,9 @@ class Parser:
         me_home_df = pnd.DataFrame(data=me_home_d)
         # me_home_df.to_csv(teamName + "_team_home_games.csv", header=True, index=False, encoding='utf8')
         me_home_df.to_excel(writer, sheet_name=teamName + "_home_games")
-        print(me_home_df.head())
+        self.homeTeamDF = me_home_df
+        print(self.homeTeamDF.head())
+        # print(me_home_df.head())
 
         me_away_d = {'match_name': me_away_game_name, 'shots': me_away_shots, 'enemy_shots': me_away_enemy_shots,
                      'goals': me_away_good_goals, 'missed': me_away_missed_goals,
@@ -2129,7 +2137,9 @@ class Parser:
         me_away_df = pnd.DataFrame(data=me_away_d)
         # me_away_df.to_csv(teamName + "_team_away_games.csv", header=True, index=False, encoding='utf8')
         me_away_df.to_excel(writer, sheet_name=teamName + "_away_games")
-        print(me_away_df.head())
+        self.awayTeamDF = me_away_df
+        print(awayTeamDF.head())
+        # print(me_away_df.head())
 
         opponent_away_d = {'match_name': enemy_away_game_name, 'shots': enemy_away_shots, 'enemy_shots': enemy_away_enemy_shots,
                      'goals': enemy_away_good_goals, 'missed': enemy_away_missed_goals,
@@ -2148,7 +2158,9 @@ class Parser:
         opponent_away_df = pnd.DataFrame(data=opponent_away_d)
         # opponent_away_df.to_csv(teamName + "_team_enemy_away_games.csv", header=True, index=False, encoding='utf8')
         opponent_away_df.to_excel(writer, sheet_name=teamName + "_opp_away")
-        print(opponent_away_df.head())
+        self.homeTeamOppDF = opponent_home_df
+        print(homeTeamOppDF.head())
+        # print(opponent_away_df.head())
 
         opponent_home_d = {'match_name': enemy_home_game_name, 'shots': enemy_home_shots, 'enemy_shots': enemy_home_enemy_shots,
                      'goals': enemy_home_good_goals, 'missed': enemy_home_missed_goals,
@@ -2167,7 +2179,9 @@ class Parser:
         opponent_home_df = pnd.DataFrame(data=opponent_home_d)
         # opponent_home_df.to_csv(teamName + "_team_enemy_home_games.csv", header=True, index=False, encoding='utf8')
         opponent_home_df.to_excel(writer, sheet_name=teamName + "_opp_home")
-        print(opponent_home_df.head())
+        # print(opponent_home_df.head())
+        self.awayTeamOppDF = opponent_away_df
+        print(self.awayTeamOppDF.head())
         driver.close()
 
 
