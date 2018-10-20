@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # To import stock prices
 import fix_yahoo_finance as yf  
 df = yf.download('XOM','2017-08-01', '2017-12-31')
-print str(df)
+print str(type(df))
 
 
 

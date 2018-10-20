@@ -9,6 +9,11 @@ import pandas as pnd
 import time as t
 import threading
 import subprocess
+# import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
+
 
 
 # Today
@@ -25,6 +30,11 @@ class Parser:
         self.awayTeamDF = None
         self.homeTeamOppDF = None
         self.awayTeamOppDF = None
+
+        self.homeSecondTeamDF = None
+        self.awaySecondTeamDF = None
+        self.homeSecondTeamOppDF = None
+        self.awaySecondTeamOppDF = None
 
         self.selDriver = '/home/prazd/selenium/chromedriver' # for run
         # '/home/prazd/selenium/chromedriver' # for prazd
@@ -485,6 +495,7 @@ class Parser:
                 return "nice"
     
     def searchFootballInfo(self, teamName, url, writer):
+        
         chrome_options = webdriver.ChromeOptions()
 
         chrome_options.add_argument('--headless')
@@ -1232,7 +1243,8 @@ class Parser:
         me_home_df = pnd.DataFrame(data=me_home_d)
         # me_home_df.to_csv(teamName+"_team_home_games.csv", header=True, index=False, encoding='utf8')
         me_home_df.to_excel(writer,sheet_name=teamName+"_home_games")
-        print(me_home_df.head())
+        self.homeTeamDF = me_home_df
+        print(self.homeTeamDF.head())
 
         me_away_d = {'match_name': me_away_game_name, 'goals': me_away_good_goals, 'missed': me_away_missed_goals,
                      'total': me_away_total_goals, 'ball_control': me_away_ball_control,
@@ -1249,7 +1261,8 @@ class Parser:
         me_away_df = pnd.DataFrame(data=me_away_d)
         # me_away_df.to_csv(teamName+"_team_away_games.csv", header=True, index=False, encoding='utf8')
         me_away_df.to_excel(writer,sheet_name=teamName+"_away_games")
-        print(me_away_df.head())
+        self.awayTeamDF = me_away_df
+        print(awayTeamDF.head())
 
         opponent_away_d = {'match_name': enemy_away_game_name, 'goals': enemy_away_good_goals,
                      'missed': enemy_away_missed_goals,
@@ -1269,7 +1282,8 @@ class Parser:
         opponent_away_df = pnd.DataFrame(data=opponent_away_d)
         # opponent_away_df.to_csv(teamName+"_team_opp_away.csv", header=True, index=False, encoding='utf8')
         opponent_away_df.to_excel(writer,sheet_name=teamName+"_opp_away")
-        print(opponent_away_df.head())
+        self.awayTeamOppDF = opponent_away_df
+        print(self.awayTeamOppDF.head())
 
         opponent_home_d = {'match_name': enemy_home_game_name, 'goals': enemy_home_good_goals,
                            'missed': enemy_home_missed_goals,
@@ -1289,7 +1303,8 @@ class Parser:
         opponent_home_df = pnd.DataFrame(data=opponent_home_d)
         # opponent_home_df.to_csv(teamName+"_team_opponents_home.csv", header=True, index=False, encoding='utf8')
         opponent_home_df.to_excel(writer,sheet_name=teamName+"_opp_home")
-        print(opponent_home_df.head())
+        self.homeTeamOppDF = opponent_home_df
+        print(self.homeTeamOppDF.head())
         driver.close()
         # writer.save()
 
@@ -2137,8 +2152,8 @@ class Parser:
         me_away_df = pnd.DataFrame(data=me_away_d)
         # me_away_df.to_csv(teamName + "_team_away_games.csv", header=True, index=False, encoding='utf8')
         me_away_df.to_excel(writer, sheet_name=teamName + "_away_games")
-        self.awayTeamDF = me_away_df
-        print(awayTeamDF.head())
+        self.awayTeamDF = me_away_d
+        # print(self.awayTeamDF.head())
         # print(me_away_df.head())
 
         opponent_away_d = {'match_name': enemy_away_game_name, 'shots': enemy_away_shots, 'enemy_shots': enemy_away_enemy_shots,
@@ -2158,8 +2173,8 @@ class Parser:
         opponent_away_df = pnd.DataFrame(data=opponent_away_d)
         # opponent_away_df.to_csv(teamName + "_team_enemy_away_games.csv", header=True, index=False, encoding='utf8')
         opponent_away_df.to_excel(writer, sheet_name=teamName + "_opp_away")
-        self.homeTeamOppDF = opponent_home_df
-        print(homeTeamOppDF.head())
+        self.awayTeamOppDF = opponent_away_df
+        print(self.awayTeamOppDF.head())
         # print(opponent_away_df.head())
 
         opponent_home_d = {'match_name': enemy_home_game_name, 'shots': enemy_home_shots, 'enemy_shots': enemy_home_enemy_shots,
@@ -2171,7 +2186,7 @@ class Parser:
                      'enemy_penalty_time': enemy_home_me_penalty_time, 'goals_full': enemy_home_goals_full,
                      'goals_minority': enemy_home_goals_minor, 'strength_usage': enemy_home_strength_usage,
                      'won_throw_ins': enemy_home_won_throw_ins, 'lost_throw_ins': enemy_home_lost_throw_ins,
-                     't}otal_throw_ins': enemy_home_total_throw_ins, 'goals_to_empty': enemy_home_goals_in_emtpy,
+                     'total_throw_ins': enemy_home_total_throw_ins, 'goals_to_empty': enemy_home_goals_in_emtpy,
                      'percent_of_blocked_kicks': enemy_home_percent_blocked_kicks,
                      'percent_of_parry_shots': enemy_home_percent_parry_shots,
                      'percent_full_realization': enemy_home_percent_full_realization,
@@ -2180,8 +2195,8 @@ class Parser:
         # opponent_home_df.to_csv(teamName + "_team_enemy_home_games.csv", header=True, index=False, encoding='utf8')
         opponent_home_df.to_excel(writer, sheet_name=teamName + "_opp_home")
         # print(opponent_home_df.head())
-        self.awayTeamOppDF = opponent_away_df
-        print(self.awayTeamOppDF.head())
+        self.homeTeamOppDF = opponent_home_df
+        print(self.homeTeamOppDF.head())
         driver.close()
 
 
@@ -2207,7 +2222,9 @@ class Parser:
                  t2.join()
                 #  self.searchFootballInfo(team_name1,url1,writer)
                 #  self.searchFootballInfo(team_name2,url2,writer)
+                 EFW(self.awayTeamDF)
                  return "ok"
+
             finally:
                 writer.close()
                 # subprocess.call("rm ../vue/dist/static/*.xlsx;mv Football.xlsx ../vue/dist/static/",shell=True)
@@ -2221,13 +2238,44 @@ class Parser:
                 t2.start()
                 t1.join()
                 t2.join()
+                self.EFW(self.awayTeamDF,"goals")
                 return "ok"
             finally:
                 writer.close() 
-                
+        
+    def EFW(self,df,key):
+            # df = yf.download('XOM','2017-08-01', '2017-12-31')
+            print(df[key])
+            # Plot the price series
+            _, ax = plt.subplots()
+            ax.plot(df.Close, color='black')
+            # # Define minimum and maximum price points
+            
+            price_min = df.Close.min()
+            price_max = df.Close.max()
+            # # Fibonacci Levels considering original trend as upward move
+            diff = price_max - price_min
+            level1 = price_max - 0.236 * diff
+            level2 = price_max - 0.382 * diff
+            level3 = price_max - 0.618 * diff
 
+            # # print "Level", "Price"
+            # # print "0 ", price_max
+            # # print "0.236", level1
+            # # print "0.382", level2
+            # # print "0.618", level3
+            # # print "1 ", price_min
 
+            ax.axhspan(level1, price_min, alpha=0.4, color='lightsalmon')
+            ax.axhspan(level2, level1, alpha=0.5, color='palegoldenrod')
+            ax.axhspan(level3, level2, alpha=0.5, color='palegreen')
+            ax.axhspan(price_max, level3, alpha=0.5, color='powderblue')
 
+            plt.ylabel("Price")
+            plt.xlabel("Date")
+            plt.legend(loc=2)
+            plt.show()
+                            
 if __name__ == "__main__":
     full = Parser()
     test = input("Спорт:")
