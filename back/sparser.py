@@ -2152,7 +2152,7 @@ class Parser:
         me_away_df = pnd.DataFrame(data=me_away_d)
         # me_away_df.to_csv(teamName + "_team_away_games.csv", header=True, index=False, encoding='utf8')
         me_away_df.to_excel(writer, sheet_name=teamName + "_away_games")
-        self.awayTeamDF = me_away_d
+        self.awayTeamDF = me_away_df
         # print(self.awayTeamDF.head())
         # print(me_away_df.head())
 
@@ -2248,11 +2248,13 @@ class Parser:
             print(df[key])
             # Plot the price series
             _, ax = plt.subplots()
-            ax.plot(df.Close, color='black')
+            ax.plot(df[key], color='black')
             # # Define minimum and maximum price points
+            infoFromDF = list(map(int,df[key]))
+
             
-            price_min = df.Close.min()
-            price_max = df.Close.max()
+            price_min = min(infoFromDF)
+            price_max = max(infoFromDF)
             # # Fibonacci Levels considering original trend as upward move
             diff = price_max - price_min
             level1 = price_max - 0.236 * diff
@@ -2274,7 +2276,7 @@ class Parser:
             plt.ylabel("Price")
             plt.xlabel("Date")
             plt.legend(loc=2)
-            plt.show()
+            # plt.show()
                             
 if __name__ == "__main__":
     full = Parser()
