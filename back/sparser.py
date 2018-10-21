@@ -9,10 +9,8 @@ import pandas as pnd
 import time as t
 import threading
 import subprocess
-# import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('agg')
-# from _tkinter import *
 import matplotlib.pyplot as plt
 
 
@@ -2277,10 +2275,11 @@ class Parser:
                 writer.close() 
         
     def EFW(self,dfList):
+            subprocess.call("rm ./pngs/*",shell=True)
+            subprocess.call("rm ./*zip",shell=True)
             # df = yf.download('XOM','2017-08-01', '2017-12-31')
             # print(df[key])
             # Plot the price series
-
 
             # Тут нужон цикл, чтобы перебрать все датафреймы (нужно собрать ключи и по значениям строить)
             _, ax = plt.subplots()
@@ -2303,7 +2302,10 @@ class Parser:
             plt.ylabel("Price")
             plt.xlabel("Date")
             plt.legend(loc=2)
-            plt.savefig('myfig.png')
+            plt.savefig('./pngs/myfig.png') # <----- именя png == key
+            subprocess.call("zip -r results pngs", shell=True)
+
+
                             
 if __name__ == "__main__":
     full = Parser()
