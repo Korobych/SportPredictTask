@@ -12,6 +12,7 @@ import subprocess
 # import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('agg')
+# from _tkinter import *
 import matplotlib.pyplot as plt
 
 
@@ -39,6 +40,21 @@ class Parser:
         self.selDriver = '/home/prazd/selenium/chromedriver' # for run
         # '/home/prazd/selenium/chromedriver' # for prazd
         # '/app/back/chromedriver' # for docker
+
+        self.forPngCount = 0
+
+        self.allDFList = [
+            self.homeTeamDF,
+            self.awayTeamDF,
+            self.homeTeamOppDF ,
+            self.awayTeamOppDF,
+
+            self.homeSecondTeamDF,
+            self.awaySecondTeamDF,
+            self.homeSecondTeamOppDF,
+            self.awaySecondTeamOppDF 
+        ]
+      
 
     def SportToday(self, sport, first, sec):
         teams_home_array = []
@@ -623,8 +639,7 @@ class Parser:
 
 
         soccer_bloсks = driver.find_elements_by_class_name("soccer")
-        maxCount = 8
-        realCount = 0
+        forPngCount = 0
         # for tr in trs:
         for  block in soccer_bloсks[1:]:
             try:
@@ -2131,8 +2146,11 @@ class Parser:
         me_home_df = pnd.DataFrame(data=me_home_d)
         # me_home_df.to_csv(teamName + "_team_home_games.csv", header=True, index=False, encoding='utf8')
         me_home_df.to_excel(writer, sheet_name=teamName + "_home_games")
-        self.homeTeamDF = me_home_df
-        print(self.homeTeamDF.head())
+        if self.forPngCount == 0:
+                self.homeTeamDF = me_home_df
+        elif self.forPngCount == 1:
+                self.homeSecondTeamDF = me_home_df
+        # print(self.homeTeamDF.head())
         # print(me_home_df.head())
 
         me_away_d = {'match_name': me_away_game_name, 'shots': me_away_shots, 'enemy_shots': me_away_enemy_shots,
@@ -2152,7 +2170,10 @@ class Parser:
         me_away_df = pnd.DataFrame(data=me_away_d)
         # me_away_df.to_csv(teamName + "_team_away_games.csv", header=True, index=False, encoding='utf8')
         me_away_df.to_excel(writer, sheet_name=teamName + "_away_games")
-        self.awayTeamDF = me_away_df
+        if self.forPngCount == 0:
+            self.awayTeamDF = me_away_df
+        elif self.forPngCount == 1:
+            self.awaySecondTeamDF = me_away_df
         # print(self.awayTeamDF.head())
         # print(me_away_df.head())
 
@@ -2173,8 +2194,11 @@ class Parser:
         opponent_away_df = pnd.DataFrame(data=opponent_away_d)
         # opponent_away_df.to_csv(teamName + "_team_enemy_away_games.csv", header=True, index=False, encoding='utf8')
         opponent_away_df.to_excel(writer, sheet_name=teamName + "_opp_away")
-        self.awayTeamOppDF = opponent_away_df
-        print(self.awayTeamOppDF.head())
+        if self.forPngCount == 0: 
+            self.awayTeamOppDF = opponent_away_df
+        elif self.forPngCount == 1:
+            self.awaySecondTeamOppDF = opponent_away_df
+        # print(self.awayTeamOppDF.head())
         # print(opponent_away_df.head())
 
         opponent_home_d = {'match_name': enemy_home_game_name, 'shots': enemy_home_shots, 'enemy_shots': enemy_home_enemy_shots,
@@ -2195,8 +2219,11 @@ class Parser:
         # opponent_home_df.to_csv(teamName + "_team_enemy_home_games.csv", header=True, index=False, encoding='utf8')
         opponent_home_df.to_excel(writer, sheet_name=teamName + "_opp_home")
         # print(opponent_home_df.head())
-        self.homeTeamOppDF = opponent_home_df
-        print(self.homeTeamOppDF.head())
+        if self.forPngCount == 0:
+            self.homeTeamOppDF = opponent_home_df
+        elif self.forPngCount == 1:
+            self.homeSecondTeamOppDF = opponent_home_df
+        # print(self.homeTeamOppDF.head())
         driver.close()
 
 
@@ -2213,17 +2240,19 @@ class Parser:
         if sport == "Футбол":
             writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
             try:
-                 subprocess.call("rm *xlsx",shell=True)
-                 t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
-                 t2 = threading.Thread(target=self.searchFootballInfo,args=(team_name2,url2,writer))
-                 t1.start()
-                 t2.start()
-                 t1.join()
-                 t2.join()
-                #  self.searchFootballInfo(team_name1,url1,writer)
-                #  self.searchFootballInfo(team_name2,url2,writer)
-                 EFW(self.awayTeamDF)
-                 return "ok"
+                #  subprocess.call("rm *xlsx",shell=True)
+                #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
+                #  t2 = threading.Thread(target=self.searchFootballInfo,args=(team_name2,url2,writer))
+                #  t1.start()
+                #  t2.start()
+                #  t1.join()
+                #  t2.join()
+                self.searchFootballInfo(team_name1,url1,writer)
+                self.forPngCount = 1
+                self.searchFootballInfo(team_name2,url2,writer)
+                self.forPngCount = 0
+                self.EFW(self.allDFList)
+                return "ok"
 
             finally:
                 writer.close()
@@ -2231,28 +2260,34 @@ class Parser:
         elif sport == "Хоккей":
             writer = pnd.ExcelWriter('Hockey.xlsx', engine='xlsxwriter')
             try:
-                subprocess.call("rm *xlsx",shell=True)
-                t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
-                t2 = threading.Thread(target=self.searchHockeyInfo, args=(team_name2, url2, writer))
-                t1.start()
-                t2.start()
-                t1.join()
-                t2.join()
-                self.EFW(self.awayTeamDF,"goals")
+                # subprocess.call("rm *xlsx",shell=True)
+                # t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
+                # t2 = threading.Thread(target=self.searchHockeyInfo, args=(team_name2, url2, writer))
+                # t1.start()
+                # t2.start()
+                # t1.join()
+                # t2.join()
+                self.searchHockeyInfo(team_name1, url1, writer)
+                self.forPngCount = 1
+                self.searchHockeyInfo(team_name2, url2, writer)
+                self.forPngCount = 0
+                self.EFW(self.allDFList)
                 return "ok"
             finally:
                 writer.close() 
         
-    def EFW(self,df,key):
+    def EFW(self,dfList):
             # df = yf.download('XOM','2017-08-01', '2017-12-31')
-            print(df[key])
+            # print(df[key])
             # Plot the price series
+
+
+            # Тут нужон цикл, чтобы перебрать все датафреймы (нужно собрать ключи и по значениям строить)
             _, ax = plt.subplots()
             ax.plot(df[key], color='black')
-            # # Define minimum and maximum price points
-            infoFromDF = list(map(int,df[key]))
+            df[key] = df[key].astype(int).dropna()
+            infoFromDF = df[key].tolist()
 
-            
             price_min = min(infoFromDF)
             price_max = max(infoFromDF)
             # # Fibonacci Levels considering original trend as upward move
@@ -2260,14 +2295,6 @@ class Parser:
             level1 = price_max - 0.236 * diff
             level2 = price_max - 0.382 * diff
             level3 = price_max - 0.618 * diff
-
-            # # print "Level", "Price"
-            # # print "0 ", price_max
-            # # print "0.236", level1
-            # # print "0.382", level2
-            # # print "0.618", level3
-            # # print "1 ", price_min
-
             ax.axhspan(level1, price_min, alpha=0.4, color='lightsalmon')
             ax.axhspan(level2, level1, alpha=0.5, color='palegoldenrod')
             ax.axhspan(level3, level2, alpha=0.5, color='palegreen')
@@ -2276,7 +2303,7 @@ class Parser:
             plt.ylabel("Price")
             plt.xlabel("Date")
             plt.legend(loc=2)
-            # plt.show()
+            plt.savefig('myfig.png')
                             
 if __name__ == "__main__":
     full = Parser()
