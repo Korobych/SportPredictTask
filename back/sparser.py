@@ -2187,8 +2187,8 @@ class Parser:
                 # subprocess.call("rm ../vue/dist/static/*.xlsx;mv Hockey.xlsx ../vue/dist/static/",shell=True)
         
     def EFW(self, dfList):
-        subprocess.call("cd pngs;rm *;cd ..", shell=True)
-        subprocess.call("rm *zip",shell=True)
+        subprocess.call("cd pngs;rm *;", shell=True)
+        subprocess.call("cd /app/back;rm *zip",shell=True)
 
         team_list = list(iter(self.team_urls.items()))
         team_name1, url_c1 = team_list[0]
@@ -2344,7 +2344,7 @@ class Parser:
             #     continue
 
         # НЕ РОБИТ, сделать!!!!!!
-        subprocess.call("zip -r results pngs", shell=True)
+        subprocess.call("cd /app/back;zip -r results pngs", shell=True)
         # subprocess.call("mv *zip ../vue/dist/static",shell=True)
 
 
