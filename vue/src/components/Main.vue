@@ -93,7 +93,7 @@ export default {
       this.league="";
       this.excepInfo = "";
 
-      axios.post('http://ddafb520.ngrok.io/today',{"sport":this.change})
+      axios.post('http://f2a29150.ngrok.io/today',{"sport":this.change})
       .then(res=>{
         this.isActive = false
         this.Act = true
@@ -118,12 +118,12 @@ export default {
       this.score="";
       this.league="";
       this.excepInfo = "Начался поиск команд";
-      axios.post("http://ddafb520.ngrok.io/teams",{"sport":this.change,"first":this.firstTeam,"second":this.secondTeam})
+      axios.post("http://f2a29150.ngrok.io/teams",{"sport":this.change,"first":this.firstTeam,"second":this.secondTeam})
       .then(res=>{
         // console.log(res.data)
         if(res.data.info=="nice"){
           this.excepInfo = "Команды найдены.Подготавливается excel для скачивания"
-          axios.post("http://ddafb520.ngrok.io/efw",{"sport":this.change})
+          axios.post("http://f2a29150.ngrok.io/efw",{"sport":this.change})
           .then(res=>{
             if(res.data.info=="ok"){
                 console.log("OK")
