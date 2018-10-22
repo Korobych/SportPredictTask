@@ -19,13 +19,14 @@
       <button  @click="Parse()" class="btn btn-outline-success my-2 my-sm-0">Сегодня</button> 
 </div> -->
 
-  </div>
+</div>
 </nav>
 <div v-bind:class="{ loader: isActive }"></div>
 
 
 <div v-bind:class="{ excel: !excelReady }">
 <center><p>Скачайте файл Excel - <a v-bind:href="filename" download><img src="static/excel.png" width="50" height="50" alt=""></a></p></center>
+<center><p>Скачайте архив с графиками - <a href="/downloadfile/results.zip" download><img src="static/result.png" width="50" height="50" alt=""></a></p></center>
 <!-- <center><a href="#" class="button2" tabindex="0">кнопка</a></center> -->
 <div class="elfib">
 <a class="btnflip" href="">
@@ -57,7 +58,7 @@ export default {
       msg: 'Elliot Fibonacci',
       change:"",
       isActive:false,
-      excelReady : false,
+      excelReady:false,
       time:"",
       status:"",
       home_team:"",
@@ -92,7 +93,7 @@ export default {
       this.league="";
       this.excepInfo = "";
 
-      axios.post('http://d0042d05.ngrok.io/today',{"sport":this.change})
+      axios.post('http://ddafb520.ngrok.io/today',{"sport":this.change})
       .then(res=>{
         this.isActive = false
         this.Act = true
@@ -117,12 +118,12 @@ export default {
       this.score="";
       this.league="";
       this.excepInfo = "Начался поиск команд";
-      axios.post("http://d0042d05.ngrok.io/teams",{"sport":this.change,"first":this.firstTeam,"second":this.secondTeam})
+      axios.post("http://ddafb520.ngrok.io/teams",{"sport":this.change,"first":this.firstTeam,"second":this.secondTeam})
       .then(res=>{
         // console.log(res.data)
         if(res.data.info=="nice"){
           this.excepInfo = "Команды найдены.Подготавливается excel для скачивания"
-          axios.post("http://d0042d05.ngrok.io/excel",{"sport":this.change})
+          axios.post("http://ddafb520.ngrok.io/efw",{"sport":this.change})
           .then(res=>{
             if(res.data.info=="ok"){
                 console.log("OK")

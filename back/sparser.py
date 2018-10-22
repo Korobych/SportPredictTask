@@ -14,8 +14,6 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-
-
 # Today
 class Parser:
     def __init__(self):
@@ -36,7 +34,7 @@ class Parser:
         self.homeSecondTeamOppDF = None
         self.awaySecondTeamOppDF = None
 
-        self.selDriver = '/home/prazd/selenium/chromedriver' # for run
+        self.selDriver = '/home/prazd/selenium/chromedriver'  # for run
 
         # '/home/prazd/selenium/chromedriver' # for prazd
         # '/Users/Koroba/Downloads/chromedriver' # for koroba
@@ -44,8 +42,12 @@ class Parser:
 
         self.forPngCount = 0
 
-        self.my_path = os.path.abspath(os.path.dirname(__file__))
-        self.path = os.path.join(self.my_path, "../pngs")
+        # self.my_path = os.path.abspath(os.path.dirname(__file__))
+        # self.my_path = "/app/back/"
+        self.my_path = '/home/prazd/sertest/SportPredictTask/back/'
+        # '/home/prazd/sertest/SportPredictTask/back/'
+        # '/app/back'
+        self.path = os.path.join(self.my_path, "pngs")
       
 
     def SportToday(self, sport, first, sec):
@@ -66,120 +68,6 @@ class Parser:
         else:
             t = self.Sport(first,sec,sport)
             return t
-
-        # chrome_options = webdriver.ChromeOptions()
-        # chrome_options.add_argument('--headless')
-        # chrome_options.add_argument('--no-sandbox')
-        # chrome_options.add_argument('--disable-dev-shm-usage')
-
-        # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
-        # # driver = webdriver.Chrome('/Users/Koroba/Downloads/chromedriver')
-        # url = self.url + self.urls[sport]
-        # driver.get(url)
-        # teams_home = driver.find_elements_by_class_name("padl")
-        # i = 0
-        # while i < len(teams_home):
-        #     teams_home_array += [teams_home[i].text]
-        #     teams_away_array += [teams_home[i + 1].text]
-        #     i += 2
-
-        # if len(teams_away_array) == len(teams_home_array) and len(teams_away_array) > 0:
-        #     games_scores_home = driver.find_elements_by_class_name("cell_sc")
-        #     games_scores_away = driver.find_elements_by_class_name("cell_ta")
-        #     games_statuses = driver.find_elements_by_class_name("cell_aa")
-        #     games_start_times = driver.find_elements_by_class_name("cell_ad")
-
-        #     for score in games_scores_home:
-        #         teams_home_scores.append(score.text.replace('\xa0', ''))
-        #     for score in games_scores_away:
-        #         teams_away_scores.append(score.text.replace('\xa0', ''))
-        #     for game in games_statuses:
-        #         games_statuses_array.append(game.text)
-        #     for time in games_start_times:
-        #         games_start_times_array.append(time.text)
-
-        #     d = {'start_time': games_start_times_array, 'game_status': games_statuses_array,
-        #          'home_team': teams_home_array,
-        #          'score_home': teams_home_scores, 'score_away': teams_away_scores, 'away_team': teams_away_array}
-        #     # todayDataFrame = pnd.DataFrame(data = d)
-        #     # print(todayDataFrame)
-        #     return 
-        # else:
-        #     return "Bad"
-
-    # def GetLeagues(self, sport, driver):
-    #     if sport == "Футбол":
-    #         check = driver.find_elements_by_class_name("expand-league")
-    #         i = 0
-    #         while i < len(check):
-    #             try:
-    #                 check[i].click()
-    #                 i += 1
-    #             except selenium.common.exceptions.WebDriverException:
-    #                 i + 1
-    #         print("end")
-    #         t.sleep(2)
-    #         driver.execute_script("window.scrollTo(0,0);")
-    #         t.sleep(2)
-    #         return driver
-    #     else:
-    #         pass
-
-    def get_all_matches_info(self, sport, driver):
-        if sport == "Футбол":
-            # init clicks
-            driver = self.GetLeagues("Футбол", driver)
-            teams_home_array = []
-            teams_away_array = []
-            all_games_scores_array = []
-            games_statuses_array = []
-            games_start_times_array = []
-            league_array = []
-            soccer_bloсks = driver.find_elements_by_class_name("soccer")
-            last_block = ""
-            for block in soccer_bloсks[1:]:
-                country = block.find_element_by_class_name("country_part")
-                tournament = block.find_element_by_class_name("tournament_part")
-                league_string = country.text + tournament.text
-                if last_block == league_string:
-                    continue
-
-                last_block = league_string
-                tbody = block.find_element_by_tag_name("tbody")
-                trs = tbody.find_elements_by_tag_name("tr")
-                for item in trs:
-                    team_home = item.find_element_by_class_name("padr")
-                    teams_home_array.append(team_home.text)
-
-                    team_away = item.find_element_by_class_name("padl")
-                    teams_away_array.append(team_away.text)
-
-                    game_score = item.find_element_by_class_name("cell_sa")
-                    all_games_scores_array.append(game_score.text.replace('\xa0', ''))
-
-                    game_status = item.find_element_by_class_name("cell_aa")
-                    games_statuses_array.append(game_status.text)
-
-                    game_start_time = item.find_element_by_class_name("cell_ad")
-                    games_start_times_array.append(game_start_time.text)
-
-                    league_array.append(league_string)
-
-            # check number of games in league_array --  May be deleted
-            print(len(league_array))
-
-            print(len(teams_home_array), 'count of team_home')
-            print(len(teams_away_array), 'count of team_away')
-            print(len(all_games_scores_array), 'count of scores')
-            print(len(games_statuses_array), 'count of statuses')
-            print(len(games_start_times_array), 'count of start_times')
-
-            d = {'start_time': games_start_times_array, 'game_status': games_statuses_array,
-                 'home_team': teams_home_array,
-                 'score': all_games_scores_array, 'away_team': teams_away_array, 'league': league_array}
-            df = pnd.DataFrame(data=d)
-            df.to_csv("full_football_games_info.csv", header=True, index=False, encoding='utf-8')
-            return d
 
     def light_matches_info(self, sport, driver):
         if sport == "Футбол":
@@ -434,6 +322,7 @@ class Parser:
         # call for data grabbing func. Light version
         d = self.light_matches_info("Футбол", driver)
         # Full version
+
         # d = self.get_all_matches_info("Футбол", driver)
         end = t.time()
         print("время выполнения парсинга - ", end - start, " секунд.")
@@ -1699,26 +1588,26 @@ class Parser:
                     if (me_home_total_shots_to_home_team[counter - 1] != '-' and me_home_blocked_kicks[counter - 1] != '-'
                             and me_home_total_shots_to_home_team[counter - 1] != '0' and
                             me_home_blocked_kicks[counter - 1] != '0'):
-                        me_home_percent_blocked_kicks.append((100 / int(me_home_total_shots_to_home_team[counter - 1])) *
+                        me_home_percent_blocked_kicks.append(int((100 / int(me_home_total_shots_to_home_team[counter - 1]))) *
                                                                    int(me_home_blocked_kicks[counter - 1]))
                     else:
                         me_home_percent_blocked_kicks.append('-')
 
                     if (me_home_enemy_shots[counter - 1] != '-' and me_home_parry_shots[counter - 1] != '-' and
                             me_home_enemy_shots[counter - 1] != '0' and me_home_parry_shots[counter - 1] != '0'):
-                        me_home_percent_parry_shots.append((100 / int(me_home_enemy_shots[counter - 1])) *
+                        me_home_percent_parry_shots.append(int((100 / int(me_home_enemy_shots[counter - 1]))) *
                                                         int(me_home_parry_shots[counter - 1]))
                     else:
                         me_home_percent_parry_shots.append('-')
                     if (me_home_enemy_players_bans[counter - 1] != '-' and me_home_goals_full[counter - 1] != '-' and
                             me_home_enemy_players_bans[counter - 1] != '0' and me_home_goals_full[counter - 1] != '0'):
-                        me_home_percent_full_realization.append((100 / int(me_home_enemy_players_bans[counter - 1])) *
+                        me_home_percent_full_realization.append(int((100 / int(me_home_enemy_players_bans[counter - 1]))) *
                                                                    int(me_home_goals_full[counter - 1]))
                     else:
                         me_home_percent_full_realization.append('-')
                     if (me_home_total_throw_ins[counter - 1] != '-' and me_home_won_throw_ins[counter - 1] != '-' and
                             me_home_total_throw_ins[counter - 1] != '0' and me_home_won_throw_ins[counter - 1] != '0'):
-                        me_home_percent_won_throw_ins.append((100 / int(me_home_total_throw_ins[counter - 1])) *
+                        me_home_percent_won_throw_ins.append(int((100 / int(me_home_total_throw_ins[counter - 1]))) *
                                                                    int(me_home_won_throw_ins[counter - 1]))
                     else:
                         me_home_percent_won_throw_ins.append('-')
@@ -1778,28 +1667,26 @@ class Parser:
                     if (enemy_away_total_shots_to_guest_team[counter - 1] != '-' and enemy_away_blocked_kicks[
                         counter - 1] != '-' and enemy_away_total_shots_to_guest_team[counter - 1] != '0' and
                             enemy_away_blocked_kicks[counter - 1] != '0'):
-                        enemy_away_percent_blocked_kicks.append(
-                            (100 / int(enemy_away_total_shots_to_guest_team[counter - 1])) *
+                        enemy_away_percent_blocked_kicks.append(int((100 / int(enemy_away_total_shots_to_guest_team[counter - 1]))) *
                             int(enemy_away_blocked_kicks[counter - 1]))
                     else:
                         enemy_away_percent_blocked_kicks.append('-')
 
                     if (enemy_away_enemy_shots[counter - 1] != '-' and enemy_away_parry_shots[counter - 1] != '-' and
                             enemy_away_enemy_shots[counter - 1] != '0' and enemy_away_parry_shots[counter - 1] != '0'):
-                        enemy_away_percent_parry_shots.append((100 / int(enemy_away_enemy_shots[counter - 1])) *
+                        enemy_away_percent_parry_shots.append(int((100 / int(enemy_away_enemy_shots[counter - 1]))) *
                                                            int(enemy_away_parry_shots[counter - 1]))
                     else:
                         enemy_away_percent_parry_shots.append('-')
                     if (enemy_away_me_players_bans[counter - 1] != '-' and enemy_away_goals_full[counter - 1] != '-' and
                             enemy_away_me_players_bans[counter - 1] != '0' and enemy_away_goals_full[counter - 1] != '0'):
-                        enemy_away_percent_full_realization.append(
-                            (100 / int(enemy_away_me_players_bans[counter - 1])) *
+                        enemy_away_percent_full_realization.append(int((100 / int(enemy_away_me_players_bans[counter - 1]))) *
                             int(enemy_away_goals_full[counter - 1]))
                     else:
                         enemy_away_percent_full_realization.append('-')
                     if (enemy_away_total_throw_ins[counter - 1] != '-' and enemy_away_won_throw_ins[counter - 1] != '-' and
                             enemy_away_total_throw_ins[counter - 1] != '0' and enemy_away_won_throw_ins[counter - 1] != '0'):
-                        enemy_away_percent_won_throw_ins.append((100 / int(enemy_away_total_throw_ins[counter - 1])) *
+                        enemy_away_percent_won_throw_ins.append(int((100 / int(enemy_away_total_throw_ins[counter - 1]))) *
                                                                 int(enemy_away_won_throw_ins[counter - 1]))
                     else:
                         enemy_away_percent_won_throw_ins.append('-')
@@ -2021,26 +1908,26 @@ class Parser:
                     if (me_away_total_shots_to_home_team[counter - 1] != '-' and me_away_blocked_kicks[counter - 1] != '-'
                             and me_away_total_shots_to_home_team[counter - 1] != '0' and
                             me_away_blocked_kicks[counter - 1] != '0'):
-                        me_away_percent_blocked_kicks.append((100 / int(me_away_total_shots_to_home_team[counter - 1])) *
+                        me_away_percent_blocked_kicks.append(int((100 / int(me_away_total_shots_to_home_team[counter - 1]))) *
                                                              int(me_away_blocked_kicks[counter - 1]))
                     else:
                         me_away_percent_blocked_kicks.append('-')
 
                     if (me_away_enemy_shots[counter - 1] != '-' and me_away_parry_shots[counter - 1] != '-' and
                             me_away_enemy_shots[counter - 1] != '0' and me_away_parry_shots[counter - 1] != '0'):
-                        me_away_percent_parry_shots.append((100 / int(me_away_enemy_shots[counter - 1])) *
+                        me_away_percent_parry_shots.append(int((100 / int(me_away_enemy_shots[counter - 1]))) *
                                                            int(me_away_parry_shots[counter - 1]))
                     else:
                         me_away_percent_parry_shots.append('-')
                     if (me_away_enemy_players_bans[counter - 1] != '-' and me_away_goals_full[counter - 1] != '-' and
                             me_away_enemy_players_bans[counter - 1] != '0' and me_away_goals_full[counter - 1] != '0'):
-                        me_away_percent_full_realization.append((100 / int(me_away_enemy_players_bans[counter - 1])) *
+                        me_away_percent_full_realization.append(int((100 / int(me_away_enemy_players_bans[counter - 1]))) *
                                                                 int(me_away_goals_full[counter - 1]))
                     else:
                         me_away_percent_full_realization.append('-')
                     if (me_away_total_throw_ins[counter - 1] != '-' and me_away_won_throw_ins[counter - 1] != '-'
                             and me_away_total_throw_ins[counter - 1] != '0' and me_away_won_throw_ins[counter - 1] != '0'):
-                        me_away_percent_won_throw_ins.append((100 / int(me_away_total_throw_ins[counter - 1])) *
+                        me_away_percent_won_throw_ins.append(int((100 / int(me_away_total_throw_ins[counter - 1]))) *
                                                              int(me_away_won_throw_ins[counter - 1]))
                     else:
                         me_away_percent_won_throw_ins.append('-')
@@ -2101,28 +1988,26 @@ class Parser:
                     if (enemy_home_total_shots_to_guest_team[counter - 1] != '-' and enemy_home_blocked_kicks[
                         counter - 1] != '-' and enemy_home_total_shots_to_guest_team[counter - 1] != '0' and
                         enemy_home_blocked_kicks[counter - 1] != '0'):
-                        enemy_home_percent_blocked_kicks.append(
-                            (100 / int(enemy_home_total_shots_to_guest_team[counter - 1])) *
+                        enemy_home_percent_blocked_kicks.append(int((100 / int(enemy_home_total_shots_to_guest_team[counter - 1]))) *
                             int(enemy_home_blocked_kicks[counter - 1]))
                     else:
                         enemy_home_percent_blocked_kicks.append('-')
 
                     if (enemy_home_enemy_shots[counter - 1] != '-' and enemy_home_parry_shots[counter - 1] != '-' and
                             enemy_home_enemy_shots[counter - 1] != '0' and enemy_home_parry_shots[counter - 1] != '0'):
-                        enemy_home_percent_parry_shots.append((100 / int(enemy_home_enemy_shots[counter - 1])) *
+                        enemy_home_percent_parry_shots.append(int((100 / int(enemy_home_enemy_shots[counter - 1]))) *
                                                               int(enemy_home_parry_shots[counter - 1]))
                     else:
                         enemy_home_percent_parry_shots.append('-')
                     if (enemy_home_me_players_bans[counter - 1] != '-' and enemy_home_goals_full[counter - 1] != '-' and
                             enemy_home_me_players_bans[counter - 1] != '0' and enemy_home_goals_full[counter - 1] != '0'):
-                        enemy_home_percent_full_realization.append(
-                            (100 / int(enemy_home_me_players_bans[counter - 1])) *
+                        enemy_home_percent_full_realization.append(int((100 / int(enemy_home_me_players_bans[counter - 1]))) *
                             int(enemy_home_goals_full[counter - 1]))
                     else:
                         enemy_home_percent_full_realization.append('-')
                     if (enemy_home_total_throw_ins[counter - 1] != '-' and enemy_home_won_throw_ins[counter - 1] != '-' and
                             enemy_home_total_throw_ins[counter - 1] != '0' and enemy_home_won_throw_ins[counter - 1] != '0'):
-                        enemy_home_percent_won_throw_ins.append((100 / int(enemy_home_total_throw_ins[counter - 1])) *
+                        enemy_home_percent_won_throw_ins.append(int((100 / int(enemy_home_total_throw_ins[counter - 1]))) *
                                                                 int(enemy_home_won_throw_ins[counter - 1]))
                     else:
                         enemy_home_percent_won_throw_ins.append('-')
@@ -2242,7 +2127,7 @@ class Parser:
         if sport == "Футбол":
             writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
             try:
-                #  subprocess.call("rm *xlsx",shell=True)
+                subprocess.call("rm *xlsx",shell=True)
                 #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
                 #  t2 = threading.Thread(target=self.searchFootballInfo,args=(team_name2,url2,writer))
                 #  t1.start()
@@ -2273,7 +2158,7 @@ class Parser:
         elif sport == "Хоккей":
             writer = pnd.ExcelWriter('Hockey.xlsx', engine='xlsxwriter')
             try:
-                # subprocess.call("rm *xlsx",shell=True)
+                subprocess.call("rm *xlsx",shell=True)
                 # t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
                 # t2 = threading.Thread(target=self.searchHockeyInfo, args=(team_name2, url2, writer))
                 # t1.start()
@@ -2299,171 +2184,171 @@ class Parser:
                 return "ok"
             finally:
                 writer.close() 
+                # subprocess.call("rm ../vue/dist/static/*.xlsx;mv Hockey.xlsx ../vue/dist/static/",shell=True)
         
     def EFW(self, dfList):
-        # НЕ РОБИТ, сделать!!!!!!!!!!!!
+        subprocess.call("cd pngs;rm *;cd ..", shell=True)
+        subprocess.call("rm *zip",shell=True)
 
-        # subprocess.call("rm " + self.path + "/*", shell=True)
-        # subprocess.call("rm " + path + "./*zip", shell=True)
-
-        # Тут нужон цикл, чтобы перебрать все датафреймы (нужно собрать ключи и по значениям строить)
         team_list = list(iter(self.team_urls.items()))
         team_name1, url_c1 = team_list[0]
         team_name2, url_c2 = team_list[1]
 
         for i in range(len(dfList)):
+            # try:
+                    df = dfList[i]
+                    df = df.drop('match_name', axis=1)
+                    col_list = df.columns.tolist()
+                    # firstTeamHomeDF
+                    if i == 0:
+                        for name in col_list:
+                            graph_name = team_name1 + "_home_" + name
+                            current_df = df[[name]]
+                            current_df = current_df.astype(str)
+                            current_df[name][current_df[name] == '-'] = np.nan
+                            # print(current_df, type(current_df))
+                            if name == "ball_control":
+                                current_df[name] = current_df[name].str.rstrip('%')
+                                current_df = current_df.dropna().astype(int)
+                            else:
+                                current_df = current_df.dropna().astype(int)
+                            # print(current_df, type(current_df))
+                            infoFromDf = current_df[name].tolist()
+                            if len(infoFromDf) != 0:
+                                self.create_EFW_graph(infoFromDf, graph_name, name)
+                    # firstTeamAwayDF
+                    if i == 1:
+                        for name in col_list:
+                            graph_name = team_name1 + "_away_" + name
+                            current_df = df[[name]]
+                            current_df = current_df.astype(str)
+                            current_df[name][current_df[name] == '-'] = np.nan
+                            # print(current_df, type(current_df))
+                            if name == "ball_control":
+                                current_df[name] = current_df[name].str.rstrip('%')
+                                current_df = current_df.dropna().astype(int)
+                            else:
+                                current_df = current_df.dropna().astype(int)
+                            # print(current_df, type(current_df))
+                            infoFromDf = current_df[name].tolist()
+                            if len(infoFromDf) != 0:
+                                self.create_EFW_graph(infoFromDf, graph_name, name)
 
-            df = dfList[i]
-            df = df.drop('match_name', axis=1)
-            col_list = df.columns.tolist()
-            # firstTeamHomeDF
-            if i == 0:
-                for name in col_list:
-                    graph_name = team_name1 + "_home_" + name
-                    current_df = df[[name]]
-                    current_df = current_df.astype(str)
-                    current_df[name][current_df[name] == '-'] = np.nan
-                    # print(current_df, type(current_df))
-                    if name == "ball_control":
-                        current_df[name] = current_df[name].str.rstrip('%')
-                        current_df = current_df.dropna().astype(int)
-                    else:
-                        current_df = current_df.dropna().astype(int)
-                    # print(current_df, type(current_df))
-                    infoFromDf = current_df[name].tolist()
-                    if len(infoFromDf) != 0:
-                        self.create_EFW_graph(infoFromDf, graph_name, name)
-            # firstTeamAwayDF
-            if i == 1:
-                for name in col_list:
-                    graph_name = team_name1 + "_away_" + name
-                    current_df = df[[name]]
-                    current_df = current_df.astype(str)
-                    current_df[name][current_df[name] == '-'] = np.nan
-                    # print(current_df, type(current_df))
-                    if name == "ball_control":
-                        current_df[name] = current_df[name].str.rstrip('%')
-                        current_df = current_df.dropna().astype(int)
-                    else:
-                        current_df = current_df.dropna().astype(int)
-                    # print(current_df, type(current_df))
-                    infoFromDf = current_df[name].tolist()
-                    if len(infoFromDf) != 0:
-                        self.create_EFW_graph(infoFromDf, graph_name, name)
+                    # firstTeamOpponentsHomeDF
+                    if i == 2:
+                        for name in col_list:
+                            graph_name = team_name1 + "_opponents_home_" + name
+                            current_df = df[[name]]
+                            current_df = current_df.astype(str)
+                            current_df[name][current_df[name] == '-'] = np.nan
+                            # print(current_df, type(current_df))
+                            if name == "ball_control":
+                                current_df[name] = current_df[name].str.rstrip('%')
+                                current_df = current_df.dropna().astype(int)
+                            else:
+                                current_df = current_df.dropna().astype(int)
+                            # print(current_df, type(current_df))
+                            infoFromDf = current_df[name].tolist()
+                            if len(infoFromDf) != 0:
+                                self.create_EFW_graph(infoFromDf, graph_name, name)
 
-            # firstTeamOpponentsHomeDF
-            if i == 2:
-                for name in col_list:
-                    graph_name = team_name1 + "_opponents_home_" + name
-                    current_df = df[[name]]
-                    current_df = current_df.astype(str)
-                    current_df[name][current_df[name] == '-'] = np.nan
-                    # print(current_df, type(current_df))
-                    if name == "ball_control":
-                        current_df[name] = current_df[name].str.rstrip('%')
-                        current_df = current_df.dropna().astype(int)
-                    else:
-                        current_df = current_df.dropna().astype(int)
-                    # print(current_df, type(current_df))
-                    infoFromDf = current_df[name].tolist()
-                    if len(infoFromDf) != 0:
-                        self.create_EFW_graph(infoFromDf, graph_name, name)
+                    # firstTeamOpponentsAwayDF
+                    if i == 3:
+                        for name in col_list:
+                            graph_name = team_name1 + "_opponents_away_" + name
+                            current_df = df[[name]]
+                            current_df = current_df.astype(str)
+                            current_df[name][current_df[name] == '-'] = np.nan
+                            # print(current_df, type(current_df))
+                            if name == "ball_control":
+                                current_df[name] = current_df[name].str.rstrip('%')
+                                current_df = current_df.dropna().astype(int)
+                            else:
+                                current_df = current_df.dropna().astype(int)
+                            # print(current_df, type(current_df))
+                            infoFromDf = current_df[name].tolist()
+                            if len(infoFromDf) != 0:
+                                self.create_EFW_graph(infoFromDf, graph_name, name)
 
-            # firstTeamOpponentsAwayDF
-            if i == 3:
-                for name in col_list:
-                    graph_name = team_name1 + "_opponents_away_" + name
-                    current_df = df[[name]]
-                    current_df = current_df.astype(str)
-                    current_df[name][current_df[name] == '-'] = np.nan
-                    # print(current_df, type(current_df))
-                    if name == "ball_control":
-                        current_df[name] = current_df[name].str.rstrip('%')
-                        current_df = current_df.dropna().astype(int)
-                    else:
-                        current_df = current_df.dropna().astype(int)
-                    # print(current_df, type(current_df))
-                    infoFromDf = current_df[name].tolist()
-                    if len(infoFromDf) != 0:
-                        self.create_EFW_graph(infoFromDf, graph_name, name)
+                    # secondTeamHomeDF
+                    if i == 4:
+                        for name in col_list:
+                            graph_name = team_name2 + "_home_" + name
+                            current_df = df[[name]]
+                            current_df = current_df.astype(str)
+                            current_df[name][current_df[name] == '-'] = np.nan
+                            # print(current_df, type(current_df))
+                            if name == "ball_control":
+                                current_df[name] = current_df[name].str.rstrip('%')
+                                current_df = current_df.dropna().astype(int)
+                            else:
+                                current_df = current_df.dropna().astype(int)
+                            # print(current_df, type(current_df))
+                            infoFromDf = current_df[name].tolist()
+                            if len(infoFromDf) != 0:
+                                self.create_EFW_graph(infoFromDf, graph_name, name)
+                    # secondTeamAwayDF
+                    if i == 5:
+                        for name in col_list:
+                            graph_name = team_name2 + "_away_" + name
+                            current_df = df[[name]]
+                            current_df = current_df.astype(str)
+                            current_df[name][current_df[name] == '-'] = np.nan
+                            # print(current_df, type(current_df))
+                            if name == "ball_control":
+                                current_df[name] = current_df[name].str.rstrip('%')
+                                current_df = current_df.dropna().astype(int)
+                            else:
+                                current_df = current_df.dropna().astype(int)
+                            # print(current_df, type(current_df))
+                            infoFromDf = current_df[name].tolist()
+                            if len(infoFromDf) != 0:
+                                self.create_EFW_graph(infoFromDf, graph_name, name)
 
-            # secondTeamHomeDF
-            if i == 4:
-                for name in col_list:
-                    graph_name = team_name2 + "_home_" + name
-                    current_df = df[[name]]
-                    current_df = current_df.astype(str)
-                    current_df[name][current_df[name] == '-'] = np.nan
-                    # print(current_df, type(current_df))
-                    if name == "ball_control":
-                        current_df[name] = current_df[name].str.rstrip('%')
-                        current_df = current_df.dropna().astype(int)
-                    else:
-                        current_df = current_df.dropna().astype(int)
-                    # print(current_df, type(current_df))
-                    infoFromDf = current_df[name].tolist()
-                    if len(infoFromDf) != 0:
-                        self.create_EFW_graph(infoFromDf, graph_name, name)
-            # secondTeamAwayDF
-            if i == 5:
-                for name in col_list:
-                    graph_name = team_name2 + "_away_" + name
-                    current_df = df[[name]]
-                    current_df = current_df.astype(str)
-                    current_df[name][current_df[name] == '-'] = np.nan
-                    # print(current_df, type(current_df))
-                    if name == "ball_control":
-                        current_df[name] = current_df[name].str.rstrip('%')
-                        current_df = current_df.dropna().astype(int)
-                    else:
-                        current_df = current_df.dropna().astype(int)
-                    # print(current_df, type(current_df))
-                    infoFromDf = current_df[name].tolist()
-                    if len(infoFromDf) != 0:
-                        self.create_EFW_graph(infoFromDf, graph_name, name)
+                    # secondTeamOpponentsHomeDF
+                    if i == 6:
+                        for name in col_list:
+                            graph_name = team_name2 + "_opponents_home_" + name
+                            current_df = df[[name]]
+                            current_df = current_df.astype(str)
+                            current_df[name][current_df[name] == '-'] = np.nan
+                            # print(current_df, type(current_df))
+                            if name == "ball_control":
+                                current_df[name] = current_df[name].str.rstrip('%')
+                                current_df = current_df.dropna().astype(int)
+                            else:
+                                current_df = current_df.dropna().astype(int)
+                            # print(current_df, type(current_df))
+                            infoFromDf = current_df[name].tolist()
+                            if len(infoFromDf) != 0:
+                                self.create_EFW_graph(infoFromDf, graph_name, name)
 
-            # secondTeamOpponentsHomeDF
-            if i == 6:
-                for name in col_list:
-                    graph_name = team_name2 + "_opponents_home_" + name
-                    current_df = df[[name]]
-                    current_df = current_df.astype(str)
-                    current_df[name][current_df[name] == '-'] = np.nan
-                    # print(current_df, type(current_df))
-                    if name == "ball_control":
-                        current_df[name] = current_df[name].str.rstrip('%')
-                        current_df = current_df.dropna().astype(int)
-                    else:
-                        current_df = current_df.dropna().astype(int)
-                    # print(current_df, type(current_df))
-                    infoFromDf = current_df[name].tolist()
-                    if len(infoFromDf) != 0:
-                        self.create_EFW_graph(infoFromDf, graph_name, name)
-
-            # secondTeamOpponentsAwayDF
-            if i == 7:
-                for name in col_list:
-                    graph_name = team_name2 + "_opponents_away_" + name
-                    current_df = df[[name]]
-                    current_df = current_df.astype(str)
-                    current_df[name][current_df[name] == '-'] = np.nan
-                    # print(current_df, type(current_df))
-                    if name == "ball_control":
-                        current_df[name] = current_df[name].str.rstrip('%')
-                        current_df = current_df.dropna().astype(int)
-                    else:
-                        current_df = current_df.dropna().astype(int)
-                    # print(current_df, type(current_df))
-                    infoFromDf = current_df[name].tolist()
-                    if len(infoFromDf) != 0:
-                        self.create_EFW_graph(infoFromDf, graph_name, name)
+                    # secondTeamOpponentsAwayDF
+                    if i == 7:
+                        for name in col_list:
+                            graph_name = team_name2 + "_opponents_away_" + name
+                            current_df = df[[name]]
+                            current_df = current_df.astype(str)
+                            current_df[name][current_df[name] == '-'] = np.nan
+                            # print(current_df, type(current_df))
+                            if name == "ball_control":
+                                current_df[name] = current_df[name].str.rstrip('%')
+                                current_df = current_df.dropna().astype(int)
+                            else:
+                                current_df = current_df.dropna().astype(int)
+                            # print(current_df, type(current_df))
+                            infoFromDf = current_df[name].tolist()
+                            if len(infoFromDf) != 0:
+                                self.create_EFW_graph(infoFromDf, graph_name, name)
+            # except ValueError:
+            #     continue
 
         # НЕ РОБИТ, сделать!!!!!!
-        # subprocess.call("zip -r results pngs", shell=True)
+        subprocess.call("zip -r results pngs", shell=True)
+        # subprocess.call("mv *zip ../vue/dist/static",shell=True)
 
 
     def create_EFW_graph(self, data, name, legend):
-
         fig, ax = plt.subplots()
         ax.plot(data, color='black', label=legend)
 

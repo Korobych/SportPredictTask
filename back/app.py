@@ -39,7 +39,7 @@ def Teams():
     # parser.team_detailed_info(data["sport"])
     return jsonify({"info":response})
 
-@app.route("/excel",methods=["POST"])
+@app.route("/efw",methods=["POST"])
 def Excel():
     data = request.get_json()
     print(data)
@@ -49,12 +49,13 @@ def Excel():
 
 
 @app.route("/downloadfile/<name>")
-def DownloadLogFile (name = None):
+def Download(name = None):
     try:
         return send_file(name, as_attachment=True)
     except Exception as e:
-        self.log.exception(e)
-        self.Error(400)
+        log.exception(e)
+        Error(400)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
