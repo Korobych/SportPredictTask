@@ -34,7 +34,7 @@ class Parser:
         self.homeSecondTeamOppDF = None
         self.awaySecondTeamOppDF = None
 
-        self.selDriver = '/home/prazd/selenium/chromedriver'  # for run
+        self.selDriver = '/app/back/chromedriver'  # for run
 
         # '/home/prazd/selenium/chromedriver' # for prazd
         # '/Users/Koroba/Downloads/chromedriver' # for koroba
@@ -44,7 +44,7 @@ class Parser:
 
         # self.my_path = os.path.abspath(os.path.dirname(__file__))
         # self.my_path = "/app/back/"
-        self.my_path = '/home/prazd/sertest/SportPredictTask/back/'
+        self.my_path = '/app/back'
         # '/home/prazd/sertest/SportPredictTask/back/'
         # '/app/back'
         self.path = os.path.join(self.my_path, "pngs")
