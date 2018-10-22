@@ -1212,7 +1212,7 @@ class Parser:
         elif self.forPngCount == 1:
             self.homeSecondTeamOppDF = opponent_home_df
         driver.close()
-        # writer.save()
+        writer.save()
 
     def searchHockeyInfo(self, teamName, url, writer):
         chrome_options = webdriver.ChromeOptions()
@@ -2112,6 +2112,7 @@ class Parser:
             self.homeSecondTeamOppDF = opponent_home_df
         # print(self.homeTeamOppDF.head())
         driver.close()
+        writer.save()
 
 
     def team_detailed_info(self, sport):
@@ -2127,7 +2128,6 @@ class Parser:
         if sport == "Футбол":
             writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
             try:
-                subprocess.call("rm *xlsx",shell=True)
                 #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
                 #  t2 = threading.Thread(target=self.searchFootballInfo,args=(team_name2,url2,writer))
                 #  t1.start()
@@ -2154,11 +2154,10 @@ class Parser:
 
             finally:
                 writer.close()
-                # subprocess.call("rm ../vue/dist/static/*.xlsx;mv Football.xlsx ../vue/dist/static/",shell=True)
+                subprocess.call("rm ../vue/dist/static/*.xlsx;mv Football.xlsx ../vue/dist/static/",shell=True)
         elif sport == "Хоккей":
             writer = pnd.ExcelWriter('Hockey.xlsx', engine='xlsxwriter')
             try:
-                subprocess.call("rm *xlsx",shell=True)
                 # t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
                 # t2 = threading.Thread(target=self.searchHockeyInfo, args=(team_name2, url2, writer))
                 # t1.start()
@@ -2184,7 +2183,7 @@ class Parser:
                 return "ok"
             finally:
                 writer.close() 
-                # subprocess.call("rm ../vue/dist/static/*.xlsx;mv Hockey.xlsx ../vue/dist/static/",shell=True)
+                subprocess.call("rm ../vue/dist/static/*.xlsx;mv Hockey.xlsx ../vue/dist/static/",shell=True)
         
     def EFW(self, dfList):
         subprocess.call("cd pngs;rm *;", shell=True)
@@ -2343,7 +2342,7 @@ class Parser:
             # except ValueError:
             #     continue
 
-        # НЕ РОБИТ, сделать!!!!!!
+        subprocess.call('ls -l',shell=True)
         subprocess.call("cd /app/back;zip -r results pngs", shell=True)
         # subprocess.call("mv *zip ../vue/dist/static",shell=True)
 
@@ -2382,3 +2381,4 @@ if __name__ == "__main__":
     second = input("Вторая команда:")
     full.SportToday(test, first, second)
     full.team_detailed_info(test)
+    
