@@ -316,7 +316,7 @@ class Parser:
         url = self.url + self.urls["Футбол"]
         driver.get(url)
         # t.sleep(20)
-        t.sleep(2)
+        t.sleep(10)
         start = t.time()
 
         # call for data grabbing func. Light version
@@ -1229,7 +1229,7 @@ class Parser:
         print('Начинаем собирать информацию для ', teamName)
 
         driver.get(url)
-        t.sleep(2)
+        t.sleep(10)
         window_before = driver.window_handles[0]
         ### Your part
 
@@ -2126,6 +2126,7 @@ class Parser:
         url2 = self.url + url_c2
         # print('Начинаем собирать информацию для ', team_name1)
         if sport == "Футбол":
+            subprocess.call('rm /app/back/*xlsx',shell=True)
             writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
             try:
                 #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
@@ -2154,8 +2155,9 @@ class Parser:
 
             finally:
                 writer.close()
-                subprocess.call("rm ../vue/dist/static/*.xlsx;mv Football.xlsx ../vue/dist/static/",shell=True)
+                subprocess.call("rm ../vue/dist/static/*xlsx;cp Football.xlsx ../vue/dist/static/",shell=True)
         elif sport == "Хоккей":
+            subprocess.call('rm /app/back/*xlsx',shell=True)
             writer = pnd.ExcelWriter('Hockey.xlsx', engine='xlsxwriter')
             try:
                 # t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
@@ -2183,7 +2185,7 @@ class Parser:
                 return "ok"
             finally:
                 writer.close() 
-                subprocess.call("rm ../vue/dist/static/*.xlsx;mv Hockey.xlsx ../vue/dist/static/",shell=True)
+                subprocess.call("rm ../vue/dist/static/*xlsx;cp Hockey.xlsx ../vue/dist/static/",shell=True)
         
     def EFW(self, dfList):
         subprocess.call("cd pngs;rm *;", shell=True)
