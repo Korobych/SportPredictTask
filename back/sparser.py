@@ -34,7 +34,7 @@ class Parser:
         self.homeSecondTeamOppDF = None
         self.awaySecondTeamOppDF = None
 
-        self.selDriver = '/app/back/chromedriver'  # for run
+        self.selDriver = '/home/prazd/selenium/chromedriver'  # for run
 
         # '/home/prazd/selenium/chromedriver' # for prazd
         # '/Users/Koroba/Downloads/chromedriver' # for koroba
@@ -44,7 +44,7 @@ class Parser:
 
         # self.my_path = os.path.abspath(os.path.dirname(__file__))
         # self.my_path = "/app/back/"
-        self.my_path = '/app/back'
+        self.my_path = '/home/prazd/sertest/SportPredictTask/back/'
         # '/home/prazd/sertest/SportPredictTask/back/'
         # '/app/back'
         self.path = os.path.join(self.my_path, "pngs")
@@ -1212,7 +1212,7 @@ class Parser:
         elif self.forPngCount == 1:
             self.homeSecondTeamOppDF = opponent_home_df
         driver.close()
-        writer.save()
+        # writer.save()
 
     def searchHockeyInfo(self, teamName, url, writer):
         chrome_options = webdriver.ChromeOptions()
@@ -2112,7 +2112,7 @@ class Parser:
             self.homeSecondTeamOppDF = opponent_home_df
         # print(self.homeTeamOppDF.head())
         driver.close()
-        writer.save()
+        # writer.save()
 
 
     def team_detailed_info(self, sport):
@@ -2126,7 +2126,7 @@ class Parser:
         url2 = self.url + url_c2
         # print('Начинаем собирать информацию для ', team_name1)
         if sport == "Футбол":
-            subprocess.call('rm /app/back/*xlsx',shell=True)
+            subprocess.call('rm *xlsx',shell=True)
             writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
             try:
                 #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
@@ -2155,9 +2155,9 @@ class Parser:
 
             finally:
                 writer.close()
-                subprocess.call("rm ../vue/dist/static/*xlsx;cp Football.xlsx ../vue/dist/static/",shell=True)
+                # subprocess.call("rm ../vue/dist/static/*xlsx;cp Football.xlsx ../vue/dist/static/",shell=True)
         elif sport == "Хоккей":
-            subprocess.call('rm /app/back/*xlsx',shell=True)
+            subprocess.call('rm *xlsx',shell=True)
             writer = pnd.ExcelWriter('Hockey.xlsx', engine='xlsxwriter')
             try:
                 # t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
@@ -2185,11 +2185,11 @@ class Parser:
                 return "ok"
             finally:
                 writer.close() 
-                subprocess.call("rm ../vue/dist/static/*xlsx;cp Hockey.xlsx ../vue/dist/static/",shell=True)
+                # subprocess.call("rm ../vue/dist/static/*xlsx;cp Hockey.xlsx ../vue/dist/static/",shell=True)
         
     def EFW(self, dfList):
         subprocess.call("cd pngs;rm *;", shell=True)
-        subprocess.call("cd /app/back;rm *zip",shell=True)
+        subprocess.call("rm *zip",shell=True)
 
         team_list = list(iter(self.team_urls.items()))
         team_name1, url_c1 = team_list[0]
