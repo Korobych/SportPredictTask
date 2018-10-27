@@ -45,6 +45,7 @@ class Parser:
         # self.my_path = os.path.abspath(os.path.dirname(__file__))
         # self.my_path = "/app/back/"
         self.my_path = '/home/prazd/sertest/SportPredictTask/back/'
+        # '/Users/Koroba/PycharmProjects/SportPredictTask/back'
         # '/home/prazd/sertest/SportPredictTask/back/'
         # '/app/back'
         self.path = os.path.join(self.my_path, "pngs")
@@ -540,6 +541,8 @@ class Parser:
                             tr.click()
                         except selenium.common.exceptions.StaleElementReferenceException: 
                             print("Unclick")
+                            driver.close()
+                            driver.switch_to.window(window_before)
                             continue
 
                         window_after = driver.window_handles[1]
@@ -570,6 +573,10 @@ class Parser:
                             t.sleep(2)
                         except selenium.common.exceptions.StaleElementReferenceException: 
                             print("Unclick")
+                            me_home_game_name = me_home_game_name[:-1]
+                            enemy_away_game_name = enemy_away_game_name[:-1]
+                            driver.close()
+                            driver.switch_to.window(window_before)
                             continue
                         
 
@@ -859,7 +866,9 @@ class Parser:
                             stats.click()
                             t.sleep(2)
                         except selenium.common.exceptions.StaleElementReferenceException:
-                            print("...")
+                            print("Unclick")
+                            driver.close()
+                            driver.switch_to.window(window_before)
                             continue
                         except selenium.common.exceptions.ElementNotVisibleException:
                             t.sleep(2)
@@ -1126,6 +1135,11 @@ class Parser:
                         driver.close()
                         driver.switch_to.window(window_before)
 
+        listOfColumnsFoot = ['match_name', 'goals', 'missed',  'total', 'ball_control', 'own_kicks', 'enemy_kicks',
+                              'target_kicks', 'missed_kicks', 'enemy_blocked', 'standarts', 'corner_kicks', 'offsides',
+                              'saves', 'fauls', 'yellow_cards', 'red_cards','%goals_from_kicks',
+                              '%goals_from_targets_kicks','%blocked_kicks_by_defence', 'fauls_proportion']
+
         me_home_d = {'match_name': me_home_game_name, 'goals': me_home_good_goals, 'missed': me_home_missed_goals,
                      'total': me_home_total_goals, 'ball_control': me_home_ball_control,
                      'own_kicks': me_home_own_ball_hits, 'enemy_kicks': me_home_enemy_ball_hits,
@@ -1140,7 +1154,7 @@ class Parser:
 
         me_home_df = pnd.DataFrame(data=me_home_d)
         # me_home_df.to_csv(teamName+"_team_home_games.csv", header=True, index=False, encoding='utf8')
-        me_home_df.to_excel(writer,sheet_name=teamName+"_home_games")
+        me_home_df.to_excel(writer,sheet_name=teamName+"_home_games", columns=listOfColumnsFoot)
         if self.forPngCount == 0:
             self.homeTeamDF = me_home_df
         elif self.forPngCount == 1:
@@ -1160,7 +1174,7 @@ class Parser:
 
         me_away_df = pnd.DataFrame(data=me_away_d)
         # me_away_df.to_csv(teamName+"_team_away_games.csv", header=True, index=False, encoding='utf8')
-        me_away_df.to_excel(writer,sheet_name=teamName+"_away_games")
+        me_away_df.to_excel(writer,sheet_name=teamName+"_away_games", columns=listOfColumnsFoot)
         if self.forPngCount == 0:
             self.awayTeamDF = me_away_df
         elif self.forPngCount == 1:
@@ -1183,7 +1197,7 @@ class Parser:
 
         opponent_away_df = pnd.DataFrame(data=opponent_away_d)
         # opponent_away_df.to_csv(teamName+"_team_opp_away.csv", header=True, index=False, encoding='utf8')
-        opponent_away_df.to_excel(writer,sheet_name=teamName+"_opp_away")
+        opponent_away_df.to_excel(writer,sheet_name=teamName+"_opp_away", columns=listOfColumnsFoot)
         if self.forPngCount == 0:
             self.awayTeamOppDF = opponent_away_df
         elif self.forPngCount == 1:
@@ -1206,7 +1220,7 @@ class Parser:
 
         opponent_home_df = pnd.DataFrame(data=opponent_home_d)
         # opponent_home_df.to_csv(teamName+"_team_opponents_home.csv", header=True, index=False, encoding='utf8')
-        opponent_home_df.to_excel(writer,sheet_name=teamName+"_opp_home")
+        opponent_home_df.to_excel(writer,sheet_name=teamName+"_opp_home", columns=listOfColumnsFoot)
         if self.forPngCount == 0:
             self.homeTeamOppDF = opponent_home_df
         elif self.forPngCount == 1:
@@ -1376,6 +1390,8 @@ class Parser:
                         tr.click()
                     except selenium.common.exceptions.StaleElementReferenceException:
                         print("Unclick")
+                        driver.close()
+                        driver.switch_to.window(window_before)
                         continue
                     except selenium.common.exceptions.ElementNotVisibleException:
                         t.sleep(2)
@@ -1409,6 +1425,8 @@ class Parser:
                         t.sleep(2)
                     except selenium.common.exceptions.StaleElementReferenceException: 
                         print("Unclick")
+                        driver.close()
+                        driver.switch_to.window(window_before)
                         continue
 
                     # goals detection
@@ -2017,6 +2035,12 @@ class Parser:
                     driver.close()
                     driver.switch_to.window(window_before)
 
+        listOfColumnsHock1 = ['match_name', 'shots', 'enemy_shots', 'goals', 'missed', 'total_shots_to_home_team',
+                          'blocked_kicks', 'parry_shots', 'players_bans', 'penalty_time', 'enemy_players_bans',
+                          'enemy_penalty_time', 'goals_full',  'goals_minority', 'strength_usage', 'won_throw_ins',
+                          'lost_throw_ins', 'total_throw_ins', 'goals_to_empty',  'percent_of_blocked_kicks',
+                          'percent_of_parry_shots', 'percent_full_realization', 'percent_of_won_throw_ins']
+
         me_home_d = {'match_name': me_home_game_name, 'shots': me_home_shots, 'enemy_shots': me_home_enemy_shots,
             'goals': me_home_good_goals, 'missed': me_home_missed_goals,
             'total_shots_to_home_team': me_home_total_shots_to_home_team , 'blocked_kicks': me_home_blocked_kicks,
@@ -2032,7 +2056,7 @@ class Parser:
             'percent_of_won_throw_ins': me_home_percent_won_throw_ins}
         me_home_df = pnd.DataFrame(data=me_home_d)
         # me_home_df.to_csv(teamName + "_team_home_games.csv", header=True, index=False, encoding='utf8')
-        me_home_df.to_excel(writer, sheet_name=teamName + "_home_games")
+        me_home_df.to_excel(writer, sheet_name=teamName + "_home_games", columns=listOfColumnsHock1)
         if self.forPngCount == 0:
                 self.homeTeamDF = me_home_df
         elif self.forPngCount == 1:
@@ -2056,7 +2080,7 @@ class Parser:
                      'percent_of_won_throw_ins': me_away_percent_won_throw_ins}
         me_away_df = pnd.DataFrame(data=me_away_d)
         # me_away_df.to_csv(teamName + "_team_away_games.csv", header=True, index=False, encoding='utf8')
-        me_away_df.to_excel(writer, sheet_name=teamName + "_away_games")
+        me_away_df.to_excel(writer, sheet_name=teamName + "_away_games",  columns=listOfColumnsHock1)
         if self.forPngCount == 0:
             self.awayTeamDF = me_away_df
         elif self.forPngCount == 1:
@@ -2367,7 +2391,7 @@ class Parser:
 
         ax.set_ylabel('Value')
         ax.set_xlabel('Games Number')
-        ax.set_yticklabels([])
+        # ax.set_yticklabels([])
         ax.set_xticklabels([])
         ax.legend(loc=2)
 
