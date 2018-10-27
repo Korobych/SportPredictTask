@@ -1043,8 +1043,8 @@ class Parser:
                                 me_away_rc.append('-')
 
                         # calculated arrays
-                        me_away_percent_goals_kicks.append(int((100 / int(me_away_own_ball_hits[counter - 1])) *
-                                                            int(me_away_good_goals[counter - 1])))
+                        me_away_percent_goals_kicks.append((100 / int(me_away_own_ball_hits[counter - 1])) *
+                                                            int(me_away_good_goals[counter - 1]))
                         if (me_away_own_target_ball_hits[counter - 1] != '-' and
                                 me_away_own_target_ball_hits[counter - 1] != '0'):
                             me_away_percent_target_goals_kicks.append(int((100 / int(me_away_own_target_ball_hits[counter - 1]))
