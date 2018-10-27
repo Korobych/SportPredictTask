@@ -231,6 +231,7 @@ class Parser:
                         return 
                     else:
                         print("нет такой пары команд")
+                        print("Спарсилось:", padr.text.strip(),padl.text.strip())
         else:
             find = self.urls[sport][1:]
             sport_bloсks = driver.find_elements_by_class_name(find)
