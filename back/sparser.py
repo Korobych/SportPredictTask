@@ -903,6 +903,9 @@ class Parser:
                                 else:
                                     me_away_ball_control.append(away_value.text)
                             if param_name.text == "Удары":
+                                print("in Удары:")
+                                print(home_value.text,away_value.text)
+
                                 if home_value.text.startswith('-') and home_value.text[1:].isdigit():
                                     enemy_home_own_ball_hits.append('0')
                                     me_away_enemy_ball_hits.append('0')
@@ -1007,6 +1010,8 @@ class Parser:
                                     me_away_rc.append(away_value.text)
 
                         counter = len(me_away_game_name)
+                        print("check for length")
+                        print(counter, len(me_away_ball_control),len(me_away_own_ball_hits))
 
                         while (counter != len(me_away_ball_control) or counter != len(me_away_own_ball_hits) or counter
                             != len(me_away_enemy_ball_hits) or counter != len(me_away_own_target_ball_hits) or counter
@@ -1043,8 +1048,8 @@ class Parser:
                                 me_away_rc.append('-')
 
                         # calculated arrays
-                        me_away_percent_goals_kicks.append((100 / int(me_away_own_ball_hits[counter - 1])) *
-                                                            int(me_away_good_goals[counter - 1]))
+                        me_away_percent_goals_kicks.append(int((100 / int(me_away_own_ball_hits[counter - 1])) *
+                                                            int(me_away_good_goals[counter - 1])))
                         if (me_away_own_target_ball_hits[counter - 1] != '-' and
                                 me_away_own_target_ball_hits[counter - 1] != '0'):
                             me_away_percent_target_goals_kicks.append(int((100 / int(me_away_own_target_ball_hits[counter - 1]))
@@ -1104,6 +1109,9 @@ class Parser:
                                 enemy_home_yc.append('-')
                             if len(enemy_home_rc) != counter:
                                 enemy_home_rc.append('-')
+
+                        print("enemy_home_percent_goals_kicks:",enemy_home_percent_goals_kicks)
+                        # print()
 
                         enemy_home_percent_goals_kicks.append(int((100 / int(enemy_home_own_ball_hits[counter - 1])) *
                                                             int(enemy_home_good_goals[counter - 1])))
