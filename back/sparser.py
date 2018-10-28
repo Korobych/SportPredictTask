@@ -574,8 +574,8 @@ class Parser:
                             t.sleep(2)
                         except selenium.common.exceptions.StaleElementReferenceException: 
                             print("Unclick")
-                            me_home_game_name = me_home_game_name[:-1]
-                            enemy_away_game_name = enemy_away_game_name[:-1]
+                            me_home_game_name = me_home_game_name.pop()
+                            enemy_away_game_name = enemy_away_game_name.pop()
                             driver.close()
                             driver.switch_to.window(window_before)
                             continue
