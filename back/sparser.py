@@ -2195,7 +2195,7 @@ class Parser:
 
             finally:
                 writer.close()
-                subprocess.call("rm /app/vue/dist/static/*xlsx;cp /app/back/Football.xlsx /app/vue/dist/static/", shell=True)
+                # subprocess.call("rm /app/vue/dist/static/*xlsx;cp /app/back/Football.xlsx /app/vue/dist/static/", shell=True)
 
         elif sport == "Хоккей":
             subprocess.call('rm /app/back/*xlsx',shell=True)
@@ -2226,7 +2226,7 @@ class Parser:
                 return "ok"
             finally:
                 writer.close() 
-                subprocess.call("rm /app/vue/dist/static/*xlsx;cp /app/back/Hockey.xlsx /app/vue/dist/static/", shell=True)
+                # subprocess.call("rm /app/vue/dist/static/*xlsx;cp /app/back/Hockey.xlsx /app/vue/dist/static/", shell=True)
         
     def EFW(self, dfList):
         subprocess.call("cd /app/back/pngs;rm *;", shell=True)
