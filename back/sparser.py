@@ -33,22 +33,18 @@ class Parser:
         self.awaySecondTeamDF = None
         self.homeSecondTeamOppDF = None
         self.awaySecondTeamOppDF = None
+        self.counter = 0
 
-        self.selDriver = '/app/back/chromedriver' # for run
-
-        # '/home/prazd/selenium/chromedriver' # for prazd
-        # '/Users/Koroba/Downloads/chromedriver' # for koroba
-        # '/app/back/chromedriver' # for docker
+        
+        # self.selDriver =  '/home/prazd/selenium/chromedriver' # for prazd
+        # self.selDriver =  '/Users/Koroba/Downloads/chromedriver' # for koroba
+        self.selDriver =  '/app/back/chromedriver' # for docker
 
         self.forPngCount = 0
 
-        # self.my_path = os.path.abspath(os.path.dirname(__file__))
-        # self.my_path = "/app/back/"
-        self.my_path = '/app/back'
-        # '/Users/Koroba/PycharmProjects/SportPredictTask/back'
-        # '/home/prazd/sertest/SportPredictTask/back/'
-        # '/app/back'
-        self.path = os.path.join(self.my_path, "pngs")
+        #self.my_path = '/Users/Koroba/PycharmProjects/SportPredictTask/back'
+        # self.my_path = '/home/prazd/projects/SportPredictTask/back/'
+        self.my_path =  '/app/back'
       
 
     def SportToday(self, sport, first, sec):
@@ -526,7 +522,11 @@ class Parser:
         soccer_bloсks = driver.find_elements_by_class_name("soccer")
         forPngCount = 0
         # for tr in trs:
+
         for block in soccer_bloсks[1:]:
+            if self.counter == 7:
+                self.counter = 0
+                break
             try:
                 tbody = block.find_element_by_tag_name("tbody")
             except selenium.common.exceptions.NoSuchElementException:
@@ -535,6 +535,7 @@ class Parser:
             for tr in trs:
                     padr = tr.find_element_by_class_name('padr')
                     padl = tr.find_element_by_class_name('padl')
+
 
             # home_df updating
                     if teamName == padr.text.strip():
@@ -574,8 +575,8 @@ class Parser:
                             t.sleep(2)
                         except selenium.common.exceptions.StaleElementReferenceException: 
                             print("Unclick")
-                            me_home_game_name = me_home_game_name.pop()
-                            enemy_away_game_name = enemy_away_game_name.pop()
+                            me_home_game_name.pop()
+                            enemy_away_game_name.pop()
                             driver.close()
                             driver.switch_to.window(window_before)
                             continue
@@ -1110,8 +1111,10 @@ class Parser:
                                 enemy_home_yc.append('-')
                             if len(enemy_home_rc) != counter:
                                 enemy_home_rc.append('-')
+                            
 
                         print("enemy_home_percent_goals_kicks:",enemy_home_percent_goals_kicks)
+
                         # print()
 
                         enemy_home_percent_goals_kicks.append(int((100 / int(enemy_home_own_ball_hits[counter - 1])) *
@@ -1140,7 +1143,7 @@ class Parser:
                         else:
                             enemy_home_sum_of_badthings.append('-')
                         print(counter, ' мачта противника дома выравлены')
-
+                        self.counter += 1
                         driver.close()
                         driver.switch_to.window(window_before)
 
@@ -1385,6 +1388,10 @@ class Parser:
             
         print(sport_bloсks)
         for block in sport_bloсks[1:]:
+            if self.counter == 7:
+                self.counter = 0
+                break
+            self.counter += 1
             tbody = block.find_element_by_tag_name("tbody")
             trs = tbody.find_elements_by_tag_name("tr")
 
@@ -2159,7 +2166,7 @@ class Parser:
         url2 = self.url + url_c2
         # print('Начинаем собирать информацию для ', team_name1)
         if sport == "Футбол":
-            subprocess.call('rm *xlsx',shell=True)
+            subprocess.call('rm /app/back/*xlsx',shell=True)
             writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
             try:
                 #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
@@ -2188,9 +2195,10 @@ class Parser:
 
             finally:
                 writer.close()
-                # subprocess.call("rm ../vue/dist/static/*xlsx;cp Football.xlsx ../vue/dist/static/",shell=True)
+                subprocess.call("rm /app/vue/dist/static/*xlsx;cp /app/back/Football.xlsx /app/vue/dist/static/", shell=True)
+
         elif sport == "Хоккей":
-            subprocess.call('rm *xlsx',shell=True)
+            subprocess.call('rm /app/back/*xlsx',shell=True)
             writer = pnd.ExcelWriter('Hockey.xlsx', engine='xlsxwriter')
             try:
                 # t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
@@ -2218,11 +2226,11 @@ class Parser:
                 return "ok"
             finally:
                 writer.close() 
-                # subprocess.call("rm ../vue/dist/static/*xlsx;cp Hockey.xlsx ../vue/dist/static/",shell=True)
+                subprocess.call("rm /app/vue/dist/static/*xlsx;cp /app/back/Hockey.xlsx /app/vue/dist/static/", shell=True)
         
     def EFW(self, dfList):
-        subprocess.call("cd pngs;rm *;", shell=True)
-        subprocess.call("rm *zip",shell=True)
+        subprocess.call("cd /app/back/pngs;rm *;", shell=True)
+        subprocess.call("cd /app/back;rm *zip", shell=True)
 
         team_list = list(iter(self.team_urls.items()))
         team_name1, url_c1 = team_list[0]
@@ -2378,7 +2386,8 @@ class Parser:
             #     continue
 
         subprocess.call('ls -l',shell=True)
-        subprocess.call("cd /app/back;zip -r results pngs", shell=True)
+        subprocess.call("cd " + self.my_path + ";zip -r results pngs", shell=True)
+
         # subprocess.call("mv *zip ../vue/dist/static",shell=True)
 
 
@@ -2400,12 +2409,11 @@ class Parser:
 
         ax.set_ylabel('Value')
         ax.set_xlabel('Games Number')
-        # ax.set_yticklabels([])
         ax.set_xticklabels([])
         ax.legend(loc=2)
 
         plt.title(name)
-        plt.savefig(self.path + '/' + name + '.png')
+        plt.savefig(self.my_path + '/pngs/' + name + '.png')
         print("image saved!")
 
 
