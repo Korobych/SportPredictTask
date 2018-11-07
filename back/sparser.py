@@ -2167,7 +2167,7 @@ class Parser:
         # print('Начинаем собирать информацию для ', team_name1)
         if sport == "Футбол":
             subprocess.call('rm /app/back/*xlsx',shell=True)
-            writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
+            writer = pnd.ExcelWriter('/app/back/Football.xlsx', engine='xlsxwriter')
             try:
                 #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
                 #  t2 = threading.Thread(target=self.searchFootballInfo,args=(team_name2,url2,writer))
@@ -2199,7 +2199,7 @@ class Parser:
 
         elif sport == "Хоккей":
             subprocess.call('rm /app/back/*xlsx',shell=True)
-            writer = pnd.ExcelWriter('Hockey.xlsx', engine='xlsxwriter')
+            writer = pnd.ExcelWriter('/app/back/Hockey.xlsx', engine='xlsxwriter')
             try:
                 # t1 = threading.Thread(target=self.searchHockeyInfo, args=(team_name1, url1, writer))
                 # t2 = threading.Thread(target=self.searchHockeyInfo, args=(team_name2, url2, writer))
