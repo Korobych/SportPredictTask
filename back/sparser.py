@@ -33,7 +33,7 @@ class Parser:
         self.awaySecondTeamDF = None
         self.homeSecondTeamOppDF = None
         self.awaySecondTeamOppDF = None
-        self.counter = 0
+        self.gl_counter = 0
 
         
         # self.selDriver =  '/home/prazd/selenium/chromedriver' # for prazd
@@ -42,7 +42,7 @@ class Parser:
 
         self.forPngCount = 0
 
-        #self.my_path = '/Users/Koroba/PycharmProjects/SportPredictTask/back'
+        # self.my_path = '/Users/Koroba/PycharmProjects/SportPredictTask/back'
         # self.my_path = '/home/prazd/projects/SportPredictTask/back/'
         self.my_path =  '/app/back'
       
@@ -356,6 +356,7 @@ class Parser:
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
+
         # driver = webdriver.Chrome(self.selDriver)
         driver = webdriver.Chrome(self.selDriver,chrome_options=chrome_options)
         # driver = webdriver.Chrome('/home/prazd/selenium/chromedriver',chrome_options=chrome_options)
@@ -411,6 +412,9 @@ class Parser:
         ### Your part
 
         me_home_game_name = []
+
+        me_home_game_datetime = []
+
         me_home_good_goals = []
         me_home_missed_goals = []
         me_home_total_goals = []
@@ -439,6 +443,7 @@ class Parser:
         #
 
         me_away_game_name = []
+        me_away_game_datetime = []
         me_away_good_goals = []
         me_away_missed_goals = []
         me_away_total_goals = []
@@ -467,6 +472,7 @@ class Parser:
         #
 
         enemy_away_game_name = []
+        enemy_away_game_datetime = []
         enemy_away_good_goals = []
         enemy_away_missed_goals = []
         enemy_away_total_goals = []
@@ -495,6 +501,7 @@ class Parser:
         #
 
         enemy_home_game_name = []
+        enemy_home_game_datetime = []
         enemy_home_good_goals = []
         enemy_home_missed_goals = []
         enemy_home_total_goals = []
@@ -524,9 +531,11 @@ class Parser:
         # for tr in trs:
 
         for block in soccer_bloсks[1:]:
-            if self.counter == 7:
-                self.counter = 0
+            print('gl_counter - ', str(self.gl_counter))
+            if self.gl_counter >= 14:
+                self.gl_counter = 0
                 break
+
             try:
                 tbody = block.find_element_by_tag_name("tbody")
             except selenium.common.exceptions.NoSuchElementException:
@@ -581,6 +590,11 @@ class Parser:
                             driver.switch_to.window(window_before)
                             continue
                         
+                        # add datetime
+                        datetime = driver.find_element_by_css_selector('.info-time.mstat-date')
+                        print(datetime.text)
+                        me_home_game_datetime.append(datetime.text)
+                        enemy_away_game_datetime.append(datetime.text)
 
                         # goals detection
                         score = driver.find_elements_by_class_name('scoreboard')
@@ -836,7 +850,7 @@ class Parser:
                         else:
                             enemy_away_sum_of_badthings.append('-')
                         print(counter, ' мачта противника в гостях выравлены')
-
+                        self.gl_counter += 1
                         driver.close()
                         driver.switch_to.window(window_before)
 
@@ -869,6 +883,8 @@ class Parser:
                             t.sleep(2)
                         except selenium.common.exceptions.StaleElementReferenceException:
                             print("Unclick")
+                            me_away_game_name.pop()
+                            enemy_home_game_name.pop()
                             driver.close()
                             driver.switch_to.window(window_before)
                             continue
@@ -876,6 +892,12 @@ class Parser:
                             t.sleep(2)
                             stats.click()
                             t.sleep(2)
+
+                        # add datetime
+                        datetime = driver.find_element_by_css_selector('.info-time.mstat-date')
+                        print(datetime.text)
+                        me_away_game_datetime.append(datetime.text)
+                        enemy_home_game_datetime.append(datetime.text)
 
                         # goals detection
                         score = driver.find_elements_by_class_name('scoreboard')
@@ -905,8 +927,8 @@ class Parser:
                                 else:
                                     me_away_ball_control.append(away_value.text)
                             if param_name.text == "Удары":
-                                print("in Удары:")
-                                print(home_value.text,away_value.text)
+                                # print("in Удары:")
+                                # print(home_value.text,away_value.text)
 
                                 if home_value.text.startswith('-') and home_value.text[1:].isdigit():
                                     enemy_home_own_ball_hits.append('0')
@@ -1012,6 +1034,7 @@ class Parser:
                                     me_away_rc.append(away_value.text)
 
                         counter = len(me_away_game_name)
+
                         print("check for length")
                         print(counter, len(me_away_ball_control),len(me_away_own_ball_hits))
 
@@ -1113,9 +1136,7 @@ class Parser:
                                 enemy_home_rc.append('-')
                             
 
-                        print("enemy_home_percent_goals_kicks:",enemy_home_percent_goals_kicks)
-
-                        # print()
+                        # print("enemy_home_percent_goals_kicks:",enemy_home_percent_goals_kicks)
 
                         enemy_home_percent_goals_kicks.append(int((100 / int(enemy_home_own_ball_hits[counter - 1])) *
                                                             int(enemy_home_good_goals[counter - 1])))
@@ -1143,16 +1164,18 @@ class Parser:
                         else:
                             enemy_home_sum_of_badthings.append('-')
                         print(counter, ' мачта противника дома выравлены')
-                        self.counter += 1
+                        self.gl_counter += 1
                         driver.close()
                         driver.switch_to.window(window_before)
 
-        listOfColumnsFoot = ['match_name', 'goals', 'missed',  'total', 'ball_control', 'own_kicks', 'enemy_kicks',
-                              'target_kicks', 'missed_kicks', 'enemy_blocked', 'standarts', 'corner_kicks', 'offsides',
-                              'saves', 'fauls', 'yellow_cards', 'red_cards','%goals_from_kicks',
-                              '%goals_from_targets_kicks','%blocked_kicks_by_defence', 'fauls_proportion']
+        listOfColumnsFoot = ['match_name', 'match_date', 'goals', 'missed',  'total', 'ball_control', 'own_kicks',
+                             'enemy_kicks', 'target_kicks', 'missed_kicks', 'enemy_blocked', 'standarts',
+                             'corner_kicks', 'offsides', 'saves', 'fauls', 'yellow_cards', 'red_cards',
+                             '%goals_from_kicks', '%goals_from_targets_kicks','%blocked_kicks_by_defence',
+                             'fauls_proportion']
 
-        me_home_d = {'match_name': me_home_game_name, 'goals': me_home_good_goals, 'missed': me_home_missed_goals,
+        me_home_d = {'match_name': me_home_game_name, 'match_date': me_home_game_datetime, 'goals': me_home_good_goals,
+                     'missed': me_home_missed_goals,
                      'total': me_home_total_goals, 'ball_control': me_home_ball_control,
                      'own_kicks': me_home_own_ball_hits, 'enemy_kicks': me_home_enemy_ball_hits,
                      'target_kicks': me_home_own_target_ball_hits, 'missed_kicks': me_home_own_missed_ball_hits,
@@ -1172,7 +1195,8 @@ class Parser:
         elif self.forPngCount == 1:
             self.homeSecondTeamDF = me_home_df
 
-        me_away_d = {'match_name': me_away_game_name, 'goals': me_away_good_goals, 'missed': me_away_missed_goals,
+        me_away_d = {'match_name': me_away_game_name, 'match_date': me_away_game_datetime, 'goals': me_away_good_goals,
+                     'missed': me_away_missed_goals,
                      'total': me_away_total_goals, 'ball_control': me_away_ball_control,
                      'own_kicks': me_away_own_ball_hits, 'enemy_kicks': me_away_enemy_ball_hits,
                      'target_kicks': me_away_own_target_ball_hits, 'missed_kicks': me_away_own_missed_ball_hits,
@@ -1192,8 +1216,8 @@ class Parser:
         elif self.forPngCount == 1:
             self.awaySecondTeamDF = me_away_df
 
-        opponent_away_d = {'match_name': enemy_away_game_name, 'goals': enemy_away_good_goals,
-                     'missed': enemy_away_missed_goals,
+        opponent_away_d = {'match_name': enemy_away_game_name, 'match_date': enemy_away_game_datetime,
+                           'goals': enemy_away_good_goals, 'missed': enemy_away_missed_goals,
                      'total': enemy_away_total_goals, 'ball_control': enemy_away_ball_control,
                      'own_kicks': enemy_away_own_ball_hits, 'enemy_kicks': enemy_away_me_ball_hits,
                      'target_kicks': enemy_away_own_target_ball_hits,
@@ -1215,8 +1239,8 @@ class Parser:
         elif self.forPngCount == 1:
             self.awaySecondTeamOppDF = opponent_away_df
 
-        opponent_home_d = {'match_name': enemy_home_game_name, 'goals': enemy_home_good_goals,
-                           'missed': enemy_home_missed_goals,
+        opponent_home_d = {'match_name': enemy_home_game_name, 'match_date': enemy_home_game_datetime,
+                           'goals': enemy_home_good_goals, 'missed': enemy_home_missed_goals,
                            'total': enemy_home_total_goals, 'ball_control': enemy_home_ball_control,
                            'own_kicks': enemy_home_own_ball_hits, 'enemy_kicks': enemy_home_me_ball_hits,
                            'target_kicks': enemy_home_own_target_ball_hits,
@@ -1264,6 +1288,7 @@ class Parser:
         #
 
         me_home_game_name = []
+        me_home_game_datetime = []
         me_home_shots = []
         me_home_enemy_shots = []
         me_home_good_goals = []
@@ -1294,6 +1319,7 @@ class Parser:
         #
 
         me_away_game_name = []
+        me_away_game_datetime = []
         me_away_shots = []
         me_away_enemy_shots = []
         me_away_good_goals = []
@@ -1324,6 +1350,7 @@ class Parser:
         #
 
         enemy_away_game_name = []
+        enemy_away_game_datetime = []
         enemy_away_shots = []
         enemy_away_enemy_shots = []
         enemy_away_good_goals = []
@@ -1354,6 +1381,7 @@ class Parser:
         #
 
         enemy_home_game_name = []
+        enemy_home_game_datetime = []
         enemy_home_shots = []
         enemy_home_enemy_shots = []
         enemy_home_good_goals = []
@@ -1388,10 +1416,10 @@ class Parser:
             
         print(sport_bloсks)
         for block in sport_bloсks[1:]:
-            if self.counter == 7:
-                self.counter = 0
+            print('gl_counter - ', str(self.gl_counter))
+            if self.gl_counter >= 14:
+                self.gl_counter = 0
                 break
-            self.counter += 1
             tbody = block.find_element_by_tag_name("tbody")
             trs = tbody.find_elements_by_tag_name("tr")
 
@@ -1441,9 +1469,17 @@ class Parser:
                         t.sleep(2)
                     except selenium.common.exceptions.StaleElementReferenceException: 
                         print("Unclick")
+                        me_home_game_name.pop()
+                        enemy_away_game_name.pop()
                         driver.close()
                         driver.switch_to.window(window_before)
                         continue
+
+                    # add datetime
+                    datetime = driver.find_element_by_css_selector('.info-time.mstat-date')
+                    print(datetime.text)
+                    me_home_game_datetime.append(datetime.text)
+                    enemy_away_game_datetime.append(datetime.text)
 
                     # goals detection
                     score = driver.find_elements_by_class_name('scoreboard')
@@ -1726,7 +1762,7 @@ class Parser:
                         enemy_away_percent_won_throw_ins.append('-')
 
                     print(counter, ' мачта противника в гостях выравлены')
-
+                    self.gl_counter += 1
                     driver.close()
                     driver.switch_to.window(window_before)
 
@@ -1762,8 +1798,18 @@ class Parser:
                         stats.click()
                         t.sleep(2)
                     except selenium.common.exceptions.StaleElementReferenceException:
-                        print("...")
+                        print("Unclick")
+                        me_away_game_name.pop()
+                        enemy_home_game_name.pop()
+                        driver.close()
+                        driver.switch_to.window(window_before)
                         continue
+
+                    # add datetime
+                    datetime = driver.find_element_by_css_selector('.info-time.mstat-date')
+                    print(datetime.text)
+                    me_away_game_datetime.append(datetime.text)
+                    enemy_home_game_datetime.append(datetime.text)
 
                     # goals detection
                     score = driver.find_elements_by_class_name('scoreboard')
@@ -2047,18 +2093,19 @@ class Parser:
                         enemy_home_percent_won_throw_ins.append('-')
 
                         print(counter, ' мачта противника дома выравлены')
-
+                    self.gl_counter += 1
                     driver.close()
                     driver.switch_to.window(window_before)
 
-        listOfColumnsHock1 = ['match_name', 'shots', 'enemy_shots', 'goals', 'missed', 'total_shots_to_home_team',
-                          'blocked_kicks', 'parry_shots', 'players_bans', 'penalty_time', 'enemy_players_bans',
-                          'enemy_penalty_time', 'goals_full',  'goals_minority', 'strength_usage', 'won_throw_ins',
-                          'lost_throw_ins', 'total_throw_ins', 'goals_to_empty',  'percent_of_blocked_kicks',
-                          'percent_of_parry_shots', 'percent_full_realization', 'percent_of_won_throw_ins']
+        listOfColumnsHock1 = ['match_name', 'match_date', 'shots', 'enemy_shots', 'goals', 'missed',
+                              'total_shots_to_home_team', 'blocked_kicks', 'parry_shots', 'players_bans',
+                              'penalty_time', 'enemy_players_bans', 'enemy_penalty_time', 'goals_full',
+                              'goals_minority', 'strength_usage', 'won_throw_ins','lost_throw_ins', 'total_throw_ins',
+                              'goals_to_empty',  'percent_of_blocked_kicks', 'percent_of_parry_shots',
+                              'percent_full_realization', 'percent_of_won_throw_ins']
 
-        me_home_d = {'match_name': me_home_game_name, 'shots': me_home_shots, 'enemy_shots': me_home_enemy_shots,
-            'goals': me_home_good_goals, 'missed': me_home_missed_goals,
+        me_home_d = {'match_name': me_home_game_name, 'match_date':me_home_game_datetime, 'shots': me_home_shots,
+                     'enemy_shots': me_home_enemy_shots, 'goals': me_home_good_goals, 'missed': me_home_missed_goals,
             'total_shots_to_home_team': me_home_total_shots_to_home_team , 'blocked_kicks': me_home_blocked_kicks,
             'parry_shots': me_home_parry_shots, 'players_bans': me_home_players_bans,
             'penalty_time': me_home_penalty_time, 'enemy_players_bans': me_home_enemy_players_bans,
@@ -2080,7 +2127,8 @@ class Parser:
         # print(self.homeTeamDF.head())
         # print(me_home_df.head())
 
-        me_away_d = {'match_name': me_away_game_name, 'shots': me_away_shots, 'enemy_shots': me_away_enemy_shots,
+        me_away_d = {'match_name': me_away_game_name, 'match_date': me_away_game_datetime, 'shots': me_away_shots,
+                     'enemy_shots': me_away_enemy_shots,
                      'goals': me_away_good_goals, 'missed': me_away_missed_goals,
                      'total_shots_to_home_team': me_away_total_shots_to_home_team,
                      'blocked_kicks': me_away_blocked_kicks,
@@ -2104,7 +2152,8 @@ class Parser:
         # print(self.awayTeamDF.head())
         # print(me_away_df.head())
 
-        opponent_away_d = {'match_name': enemy_away_game_name, 'shots': enemy_away_shots, 'enemy_shots': enemy_away_enemy_shots,
+        opponent_away_d = {'match_name': enemy_away_game_name, 'match_date':enemy_away_game_datetime,
+                           'shots': enemy_away_shots, 'enemy_shots': enemy_away_enemy_shots,
                      'goals': enemy_away_good_goals, 'missed': enemy_away_missed_goals,
                      'total_shots_to_guest_team': enemy_away_total_shots_to_guest_team,
                      'blocked_kicks': enemy_away_blocked_kicks,
@@ -2128,7 +2177,8 @@ class Parser:
         # print(self.awayTeamOppDF.head())
         # print(opponent_away_df.head())
 
-        opponent_home_d = {'match_name': enemy_home_game_name, 'shots': enemy_home_shots, 'enemy_shots': enemy_home_enemy_shots,
+        opponent_home_d = {'match_name': enemy_home_game_name, 'match_date': enemy_home_game_datetime,
+                           'shots': enemy_home_shots, 'enemy_shots': enemy_home_enemy_shots,
                      'goals': enemy_home_good_goals, 'missed': enemy_home_missed_goals,
                      'total_shots_to_guest_team': enemy_home_total_shots_to_guest_team,
                      'blocked_kicks': enemy_home_blocked_kicks,
@@ -2166,8 +2216,11 @@ class Parser:
         url2 = self.url + url_c2
         # print('Начинаем собирать информацию для ', team_name1)
         if sport == "Футбол":
+
             subprocess.call('rm /app/back/*xlsx',shell=True)
             writer = pnd.ExcelWriter('/app/back/Football.xlsx', engine='xlsxwriter')
+            writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
+
             try:
                 #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
                 #  t2 = threading.Thread(target=self.searchFootballInfo,args=(team_name2,url2,writer))
@@ -2229,6 +2282,7 @@ class Parser:
                 # subprocess.call("rm /app/vue/dist/static/*xlsx;cp /app/back/Hockey.xlsx /app/vue/dist/static/", shell=True)
         
     def EFW(self, dfList):
+
         subprocess.call("cd /app/back/pngs;rm *;", shell=True)
         subprocess.call("cd /app/back;rm *zip", shell=True)
 
@@ -2240,6 +2294,7 @@ class Parser:
             # try:
                     df = dfList[i]
                     df = df.drop('match_name', axis=1)
+                    df = df.drop('match_date', axis=1)
                     col_list = df.columns.tolist()
                     # firstTeamHomeDF
                     if i == 0:
@@ -2385,7 +2440,7 @@ class Parser:
             # except ValueError:
             #     continue
 
-        subprocess.call('ls -l',shell=True)
+        subprocess.call('ls -l', shell=True)
         subprocess.call("cd " + self.my_path + ";zip -r results pngs", shell=True)
 
         # subprocess.call("mv *zip ../vue/dist/static",shell=True)
