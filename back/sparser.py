@@ -2219,7 +2219,6 @@ class Parser:
 
             subprocess.call('rm /app/back/*xlsx',shell=True)
             writer = pnd.ExcelWriter('/app/back/Football.xlsx', engine='xlsxwriter')
-            writer = pnd.ExcelWriter('Football.xlsx', engine='xlsxwriter')
 
             try:
                 #  t1 = threading.Thread(target=self.searchFootballInfo,args=(team_name1,url1,writer))
