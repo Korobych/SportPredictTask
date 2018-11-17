@@ -2310,6 +2310,10 @@ class Parser:
                                 current_df = current_df.dropna().astype(int)
                             # print(current_df, type(current_df))
                             infoFromDf = current_df[name].tolist()
+
+                            # predict part
+                            self.smart_mean(infoFromDf)
+
                             if len(infoFromDf) != 0:
                                 self.create_EFW_graph(infoFromDf, graph_name, name)
                     # firstTeamAwayDF
@@ -2327,6 +2331,8 @@ class Parser:
                                 current_df = current_df.dropna().astype(int)
                             # print(current_df, type(current_df))
                             infoFromDf = current_df[name].tolist()
+                            # predict part
+                            self.smart_mean(infoFromDf)
                             if len(infoFromDf) != 0:
                                 self.create_EFW_graph(infoFromDf, graph_name, name)
 
@@ -2345,6 +2351,8 @@ class Parser:
                                 current_df = current_df.dropna().astype(int)
                             # print(current_df, type(current_df))
                             infoFromDf = current_df[name].tolist()
+                            # predict part
+                            self.smart_mean(infoFromDf)
                             if len(infoFromDf) != 0:
                                 self.create_EFW_graph(infoFromDf, graph_name, name)
 
@@ -2363,6 +2371,8 @@ class Parser:
                                 current_df = current_df.dropna().astype(int)
                             # print(current_df, type(current_df))
                             infoFromDf = current_df[name].tolist()
+                            # predict part
+                            self.smart_mean(infoFromDf)
                             if len(infoFromDf) != 0:
                                 self.create_EFW_graph(infoFromDf, graph_name, name)
 
@@ -2381,6 +2391,8 @@ class Parser:
                                 current_df = current_df.dropna().astype(int)
                             # print(current_df, type(current_df))
                             infoFromDf = current_df[name].tolist()
+                            # predict part
+                            self.smart_mean(infoFromDf)
                             if len(infoFromDf) != 0:
                                 self.create_EFW_graph(infoFromDf, graph_name, name)
                     # secondTeamAwayDF
@@ -2398,6 +2410,8 @@ class Parser:
                                 current_df = current_df.dropna().astype(int)
                             # print(current_df, type(current_df))
                             infoFromDf = current_df[name].tolist()
+                            # predict part
+                            self.smart_mean(infoFromDf)
                             if len(infoFromDf) != 0:
                                 self.create_EFW_graph(infoFromDf, graph_name, name)
 
@@ -2416,6 +2430,8 @@ class Parser:
                                 current_df = current_df.dropna().astype(int)
                             # print(current_df, type(current_df))
                             infoFromDf = current_df[name].tolist()
+                            # predict part
+                            self.smart_mean(infoFromDf)
                             if len(infoFromDf) != 0:
                                 self.create_EFW_graph(infoFromDf, graph_name, name)
 
@@ -2434,6 +2450,8 @@ class Parser:
                                 current_df = current_df.dropna().astype(int)
                             # print(current_df, type(current_df))
                             infoFromDf = current_df[name].tolist()
+                            # predict part
+                            self.smart_mean(infoFromDf)
                             if len(infoFromDf) != 0:
                                 self.create_EFW_graph(infoFromDf, graph_name, name)
             # except ValueError:
@@ -2447,7 +2465,8 @@ class Parser:
 
     def create_EFW_graph(self, data, name, legend):
         fig, ax = plt.subplots()
-        ax.plot(data, color='black', label=legend)
+        ax.plot(data[:-1], color='black', label=legend)
+        ax.plot(len(data) - 1, data[-1], color='red', marker='o', label="predict")
 
         price_min = min(data)
         price_max = max(data)
@@ -2469,6 +2488,23 @@ class Parser:
         plt.title(name)
         plt.savefig(self.my_path + '/pngs/' + name + '.png')
         print("image saved!")
+
+    def smart_mean(self, df):
+        np_arr = np.asarray(df)
+        if len(df) > 2:
+            if np_arr[-2:].mean() > np_arr.mean():
+                if (np_arr[-1] - np_arr[-2]) > 0:
+                    if np_arr.max() <= (np_arr[-1] - np_arr[-2]):
+                        smart = int((np_arr[-1] - np_arr[-2]) + np_arr[-1] / 1.5)
+                    else:
+                        smart = (np_arr[-1] - np_arr[-2]) + np_arr[-1]
+                else:
+                    smart = np_arr.mean()
+            elif np_arr[-2:].mean() == np_arr.mean():
+                smart = np_arr[-2]
+            else:
+                smart = (np_arr.mean() + np_arr[-2:].mean()) / 1.3
+            df.append(smart)
 
 
 if __name__ == "__main__":
