@@ -576,6 +576,7 @@ class Parser:
                         
                         ############## for unclick
                         try:
+                            t.sleep(1)
                             stats.click()
                             t.sleep(2)
                         except selenium.common.exceptions.ElementNotVisibleException:
@@ -764,8 +765,12 @@ class Parser:
                                 me_home_rc.append('-')
 
                         # calculated arrays
-                        me_home_percent_goals_kicks.append(int((100 / int(me_home_own_ball_hits[counter - 1])) *
+                        if me_home_own_ball_hits[counter - 1] != '-' and me_home_own_ball_hits[counter - 1] != '0':
+                            me_home_percent_goals_kicks.append(int((100 / int(me_home_own_ball_hits[counter - 1])) *
                                                             int(me_home_good_goals[counter - 1])))
+                        else:
+                            me_home_percent_goals_kicks.append('-')
+
                         if me_home_own_target_ball_hits[counter - 1] != '-' and me_home_own_target_ball_hits[counter - 1] != '0':
                             me_home_percent_target_goals_kicks.append(int((100 / int(me_home_own_target_ball_hits[counter - 1]))
                                                                     * int(me_home_good_goals[counter - 1])))
@@ -825,8 +830,12 @@ class Parser:
                             if len(enemy_away_rc) != counter:
                                 enemy_away_rc.append('-')
 
-                        enemy_away_percent_goals_kicks.append(int((100 / int(enemy_away_own_ball_hits[counter - 1])) *
+                        if enemy_away_own_ball_hits[counter - 1] != '-' and enemy_away_own_ball_hits[counter - 1] != '0':
+                            enemy_away_percent_goals_kicks.append(int((100 / int(enemy_away_own_ball_hits[counter - 1]))*
                                                         int(enemy_away_good_goals[counter - 1])))
+                        else:
+                            enemy_away_percent_goals_kicks.append('-')
+
                         if (enemy_away_own_target_ball_hits[counter - 1] != '-' and
                                 enemy_away_own_target_ball_hits[counter - 1] != '0'):
                             enemy_away_percent_target_goals_kicks.append(int((100 / int(enemy_away_own_target_ball_hits[counter - 1]))
@@ -879,6 +888,7 @@ class Parser:
                         me_away_game_name.append(game_name)
 
                         try:
+                            t.sleep(1)
                             stats.click()
                             t.sleep(2)
                         except selenium.common.exceptions.StaleElementReferenceException:
@@ -1073,8 +1083,12 @@ class Parser:
                                 me_away_rc.append('-')
 
                         # calculated arrays
-                        me_away_percent_goals_kicks.append(int((100 / int(me_away_own_ball_hits[counter - 1])) *
+                        if me_away_own_ball_hits[counter - 1] != '-' and me_away_own_ball_hits[counter - 1] != '0':
+                            me_away_percent_goals_kicks.append(int((100 / int(me_away_own_ball_hits[counter - 1])) *
                                                             int(me_away_good_goals[counter - 1])))
+                        else:
+                            me_away_percent_goals_kicks.append('-')
+
                         if (me_away_own_target_ball_hits[counter - 1] != '-' and
                                 me_away_own_target_ball_hits[counter - 1] != '0'):
                             me_away_percent_target_goals_kicks.append(int((100 / int(me_away_own_target_ball_hits[counter - 1]))
@@ -1134,12 +1148,13 @@ class Parser:
                                 enemy_home_yc.append('-')
                             if len(enemy_home_rc) != counter:
                                 enemy_home_rc.append('-')
-                            
 
-                        # print("enemy_home_percent_goals_kicks:",enemy_home_percent_goals_kicks)
-
-                        enemy_home_percent_goals_kicks.append(int((100 / int(enemy_home_own_ball_hits[counter - 1])) *
+                        if enemy_home_own_ball_hits[counter - 1] != '-' and enemy_home_own_ball_hits[counter - 1] != '0':
+                            enemy_home_percent_goals_kicks.append(int((100 / int(enemy_home_own_ball_hits[counter - 1]))*
                                                             int(enemy_home_good_goals[counter - 1])))
+                        else:
+                            enemy_home_percent_goals_kicks.append('-')
+
                         if (enemy_home_own_target_ball_hits[counter - 1] != '-' and
                                 enemy_home_own_target_ball_hits[counter - 1] != '0'):
                             enemy_home_percent_target_goals_kicks.append(int(
